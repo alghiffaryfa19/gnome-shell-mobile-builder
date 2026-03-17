@@ -209,7 +209,7 @@ jobs:
 
           mkdir -p /usr/lib/x86_64-linux-gnu/pkgconfig
 
-          cat <<EOF | sudo tee /usr/lib/x86_64-linux-gnu/pkgconfig/systemd.pc
+          cat <<EOF | tee /usr/lib/x86_64-linux-gnu/pkgconfig/systemd.pc
           prefix=/usr
           exec_prefix=\${prefix}
           libdir=\${exec_prefix}/lib/x86_64-linux-gnu
