@@ -67,8 +67,12 @@ jobs:
             libstartup-notification0-dev \
             xserver-xorg-dev xwayland \
             gettext wget libxkbcommon-x11-dev libgbm-dev libsysprof-6-dev libgl-dev \
-            libegl-dev libgles2-mesa-dev libglvnd-dev libwayland-egl-backend-dev xkb-data libxcb-randr0-dev libsysprof-capture-4-dev libevdev-dev \
+            libegl-dev libgles2-mesa-dev libglvnd-dev libwayland-egl-backend-dev xkb-data libxcb-randr0-dev libsysprof-capture-4-dev libevdev-dev sysprof \
             xcvt
+
+          mkdir -p /usr/share/dbus-1/interfaces
+          ln -s /usr/share/dbus-1/interfaces/org.gnome.Sysprof.Profiler.xml \
+                /usr/share/dbus-1/interfaces/org.gnome.Sysprof3.Profiler.xml || true
 
       # ✅ Ambil dari workflow sebelumnya (artifact, bukan release)
       - name: "📥 Download GSD"
