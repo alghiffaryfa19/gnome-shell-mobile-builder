@@ -1,0 +1,106 @@
+name: Build Mutter Mobile (.deb)
+
+on:
+  workflow_run:
+    workflows: ["Build GSD Mobile (.deb)"]
+    types:
+      - completed
+      
+on:
+  push:
+    paths:
+      - ".github/workflows/mutter-mobile.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    env:
+      PKGVER: 48.0
+      PKGREL: 2
+      COMMIT: 48.mobile.0
+      GVDB_COMMIT: b54bc5da25127ef416858a3ad92e57159ff565b3
+
+    steps:
+      - name: Install deps
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            build-essential meson ninja-build pkg-config \
+            libatk1.0-dev libcairo2-dev libdbus-1-dev \
+            libfribidi-dev libgdk-pixbuf-2.0-dev \
+            libglib2.0-dev libgnome-desktop-3-dev \
+            libgraphene-1.0-dev libgtk-3-dev \
+            libjson-glib-dev liblcms2-dev \
+            libcanberra-gtk3-dev libdrm-dev \
+            libgudev-1.0-dev libinput-dev \
+            libx11-dev libxcb1-dev libxcomposite-dev \
+            libxcursor-dev libxdamage-dev libxext-dev \
+            libxfixes-dev libxi-dev libxrandr-dev \
+            libxrender-dev libxtst-dev \
+            libxkbcommon-dev libxkbfile-dev \
+            mesa-common-dev libpango1.0-dev \
+            libpipewire-0.3-dev \
+            wayland-protocols libwayland-dev \
+            xwayland wget
+
+      # 🔥 Ambil artifact dari workflow sebelumnya
+      - name: Download GSD deb
+        uses: actions/download-artifact@v4
+        with:
+          name: gsd-deb
+
+      - name: Install GSD
+        run: sudo dpkg -i gsd-mobile.deb || sudo apt -f install -y
+
+      - name: Download source
+        run: |
+          wget https://gitlab.gnome.org/verdre/mutter-mobile/-/archive/${COMMIT}/mutter-mobile-${COMMIT}.tar.gz
+          wget https://gitlab.gnome.org/GNOME/gvdb/-/archive/${GVDB_COMMIT}/gvdb-${GVDB_COMMIT}.tar.gz
+          tar -xzf *.tar.gz
+
+      - name: Prepare
+        run: |
+          cd mutter-mobile-${COMMIT}
+          mkdir -p subprojects/gvdb
+          mv ../gvdb-*/* subprojects/gvdb
+
+      - name: Build
+        run: |
+          cd mutter-mobile-${COMMIT}
+          meson setup build \
+            -Dudev=true \
+            -Dnative_backend=true \
+            -Dintrospection=true \
+            -Dxwayland_path=/usr/bin/Xwayland \
+            -Dremote_desktop=true \
+            -Dtests=disabled
+
+          meson compile -C build
+
+      - name: Install
+        run: |
+          cd mutter-mobile-${COMMIT}
+          DESTDIR=$(pwd)/pkg meson install -C build
+
+      - name: Pack deb
+        run: |
+          mkdir -p deb/DEBIAN deb/usr
+          cp -r mutter-mobile-${COMMIT}/pkg/usr/* deb/usr/
+
+          cat <<EOF > deb/DEBIAN/control
+          Package: mutter-mobile
+          Version: ${PKGVER}-${PKGREL}
+          Architecture: amd64
+          Maintainer: Newbyte
+          Depends: gnome-settings-daemon-mobile
+          Description: Mutter Mobile
+          EOF
+
+          dpkg-deb --build deb mutter-mobile.deb
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mutter-deb
+          path: mutter-mobile.deb

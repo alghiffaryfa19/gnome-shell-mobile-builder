@@ -1,0 +1,77 @@
+name: Build GSD Mobile (.deb)
+
+on:
+  push:
+    paths:
+      - ".github/workflows/gsd-mobile.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    env:
+      PKGVER: 48.0
+      PKGREL: 4
+      COMMIT: 48.mobile.0
+      GVC_COMMIT: 47c47a423ff2f55bb038d92517e4782cf051496a
+
+    steps:
+      - name: Install deps
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            build-essential meson ninja-build pkg-config \
+            libasound2-dev libcolord-dev libcups2-dev \
+            libgeoclue-2-dev libgeocode-glib-dev \
+            liblcms2-dev libcanberra-gtk3-dev \
+            libnotify-dev libwacom-dev \
+            libnss3-dev libpango1.0-dev \
+            libpolkit-gobject-1-dev libpulse-dev \
+            libupower-glib-dev libgcr-4-dev \
+            libglib2.0-dev libgnome-desktop-3-dev \
+            libgtk-3-dev libxml2-utils wget
+
+      - name: Download source
+        run: |
+          wget https://gitlab.gnome.org/verdre/gnome-settings-daemon-mobile/-/archive/${COMMIT}/gnome-settings-daemon-mobile-${COMMIT}.tar.gz
+          wget https://gitlab.gnome.org/GNOME/libgnome-volume-control/-/archive/${GVC_COMMIT}/libgnome-volume-control-${GVC_COMMIT}.tar.gz
+          tar -xzf *.tar.gz
+
+      - name: Prepare
+        run: |
+          cd gnome-settings-daemon-mobile-${COMMIT}
+          rm -rf subprojects/gvc
+          mv ../libgnome-volume-control-${GVC_COMMIT} subprojects/gvc
+
+      - name: Build
+        run: |
+          cd gnome-settings-daemon-mobile-${COMMIT}
+          meson setup build -Dsystemd=true -Delogind=false
+          meson compile -C build
+
+      - name: Install
+        run: |
+          cd gnome-settings-daemon-mobile-${COMMIT}
+          DESTDIR=$(pwd)/pkg meson install -C build
+
+      - name: Pack deb
+        run: |
+          mkdir -p deb/DEBIAN deb/usr
+          cp -r gnome-settings-daemon-mobile-${COMMIT}/pkg/usr/* deb/usr/
+
+          cat <<EOF > deb/DEBIAN/control
+          Package: gnome-settings-daemon-mobile
+          Version: ${PKGVER}-${PKGREL}
+          Architecture: amd64
+          Maintainer: Newbyte
+          Depends: pulseaudio
+          Description: GNOME Settings Daemon Mobile
+          EOF
+
+          dpkg-deb --build deb gsd-mobile.deb
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gsd-deb
+          path: gsd-mobile.deb
