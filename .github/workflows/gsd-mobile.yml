@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: write
-
+  
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -71,7 +71,6 @@ jobs:
           cd gnome-settings-daemon-mobile-${COMMIT}
 
           meson setup build \
-            --prefix=/usr \
             -Dsystemd=true \
             -Delogind=false
 
