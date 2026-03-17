@@ -168,7 +168,7 @@ jobs:
       - name: Pack deb
         run: |
           mkdir -p deb/DEBIAN deb/usr
-          cp -r mutter-mobile-${COMMIT}/pkg/usr/* deb/usr/
+          cp -r mutter-mobile-${COMMIT}/pkg/* deb/
 
           cat <<EOF > deb/DEBIAN/control
           Package: mutter-mobile
