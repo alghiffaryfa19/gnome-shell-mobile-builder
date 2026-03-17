@@ -45,7 +45,7 @@ jobs:
             libglib2.0-dev libgirepository1.0-dev gobject-introspection \
             libgtk-4-dev libgjs-dev libxml2-dev \
             libpolkit-agent-1-dev libgnome-desktop-4-dev \
-            libpango1.0-dev libecal-2.0-dev libedataserver1.2-dev \
+            libpango1.0-dev libecal2.0-dev libedataserver1.2-dev \
             libgcr-4-dev \
             libx11-dev \
             libnm-dev libsecret-1-dev \
