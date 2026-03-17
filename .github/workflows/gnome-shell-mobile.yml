@@ -5,6 +5,9 @@ on:
     workflows: ["Build Mutter Mobile (.deb)"]
     types:
       - completed
+  push:
+    paths:
+      - ".github/workflows/gnome-shell-mobile.yml"
   workflow_dispatch:
 
 permissions:
@@ -46,7 +49,7 @@ jobs:
             libpolkit-agent-1-dev \
             libgnome-desktop-4-dev \
             libpango1.0-dev \
-            libecal-2.0-dev libedataserver1.2-dev \
+            libecal2.0-dev libedataserver1.2-dev \
             libgcr-4-dev \
             libx11-dev \
             libnm-dev libsecret-1-dev \
