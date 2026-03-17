@@ -131,6 +131,12 @@ jobs:
           # debug
           pkg-config --modversion libudev || true
 
+          # fix udev pkg-config missing variable
+          echo "udevdir=/usr/lib/udev" >> /usr/lib/x86_64-linux-gnu/pkgconfig/libudev.pc
+
+          # optional debug
+          pkg-config --variable=udevdir libudev || true
+
           cd mutter-mobile-${COMMIT}
 
           meson setup build \
