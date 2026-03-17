@@ -47,7 +47,8 @@ jobs:
             xwayland wget \
             gobject-introspection libgirepository1.0-dev \
             gettext git gh libnm-dev libnma-dev libcolord-dev gettext intltool cmake \
-            libei-dev libeis-dev libdisplay-info-dev libseat-dev libliftoff-dev
+            libei-dev libeis-dev libdisplay-info-dev libseat-dev libliftoff-dev libx11-xcb-dev \
+            libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev
 
       # ✅ Ambil dari workflow sebelumnya (artifact, bukan release)
       - name: "📥 Download GSD"
