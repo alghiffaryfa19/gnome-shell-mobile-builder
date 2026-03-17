@@ -70,15 +70,26 @@ jobs:
 
       - name: Download source
         run: |
-          wget https://gitlab.gnome.org/verdre/mutter-mobile/-/archive/${COMMIT}/mutter-mobile-${COMMIT}.tar.gz
-          wget https://gitlab.gnome.org/GNOME/gvdb/-/archive/${GVDB_COMMIT}/gvdb-${GVDB_COMMIT}.tar.gz
-          tar -xzf *.tar.gz
+          # download (explicit)
+          wget -O mutter.tar.gz \
+            https://gitlab.gnome.org/verdre/mutter-mobile/-/archive/${COMMIT}/mutter-mobile-${COMMIT}.tar.gz
+
+          wget -O gvdb.tar.gz \
+            https://gitlab.gnome.org/GNOME/gvdb/-/archive/${GVDB_COMMIT}/gvdb-${GVDB_COMMIT}.tar.gz
+
+          # extract (NO wildcard)
+          tar -xzf mutter.tar.gz
+
+          mkdir gvdb
+          tar -xzf gvdb.tar.gz -C gvdb --strip-components=1
 
       - name: Prepare
         run: |
           cd mutter-mobile-${COMMIT}
           mkdir -p subprojects/gvdb
-          mv ../gvdb-*/* subprojects/gvdb
+          cp -r ../gvdb/* subprojects/gvdb/
+
+          ls -lah
 
       - name: Build
         run: |

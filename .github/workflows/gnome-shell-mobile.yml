@@ -89,16 +89,23 @@ jobs:
 
       - name: Download source
         run: |
-          wget https://gitlab.gnome.org/verdre/gnome-shell-mobile/-/archive/${COMMIT}/gnome-shell-mobile-${COMMIT}.tar.gz
-          wget https://gitlab.gnome.org/GNOME/libgnome-volume-control/-/archive/${GVC_COMMIT}/libgnome-volume-control-${GVC_COMMIT}.tar.gz
+          wget -O gnome-shell-mobile.tar.gz https://gitlab.gnome.org/verdre/gnome-shell-mobile/-/archive/${COMMIT}/gnome-shell-mobile-${COMMIT}.tar.gz
+          wget -O libgnome-volume-control.tar.gz https://gitlab.gnome.org/GNOME/libgnome-volume-control/-/archive/${GVC_COMMIT}/libgnome-volume-control-${GVC_COMMIT}.tar.gz
 
-          tar -xzf *.tar.gz
+          # extract (NO wildcard)
+          tar -xzf gnome-shell-mobile.tar.gz
+
+          mkdir gvc
+          tar -xzf libgnome-volume-control.tar.gz -C gvc --strip-components=1
 
       - name: Prepare
         run: |
           cd gnome-shell-mobile-${COMMIT}
-          rm -rf subprojects/gvc
-          mv ../libgnome-volume-control-${GVC_COMMIT} subprojects/gvc
+          
+          mkdir -p subprojects/gvc
+          cp -r ../gvc/* subprojects/gvc/
+
+          ls -lah
 
       - name: Build (systemd mode)
         run: |
