@@ -174,7 +174,7 @@ jobs:
           cat <<EOF > deb/DEBIAN/control
           Package: mutter-mobile
           Version: ${PKGVER}-${PKGREL}
-          Architecture: amd64
+          Architecture: arm64
           Maintainer: Newbyte
           Depends: gnome-settings-daemon-mobile
           Description: Mutter Mobile (Debian Trixie build)
