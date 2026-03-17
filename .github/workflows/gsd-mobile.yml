@@ -96,8 +96,24 @@ jobs:
 
           dpkg-deb --build deb gsd-mobile.deb
 
-      - name: Upload artifact
+      - name: "📤 上传构建产物"
         uses: actions/upload-artifact@v4
         with:
-          name: gsd-deb
-          path: gsd-mobile.deb
+          name: gsd
+          path: "*.deb"
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: "🏷️ 创建GitHub Release"
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: gsd
+          name: "GSD"
+          body: |
+            🧩 GSD
+          draft: false
+          prerelease: false
+          files: "*.deb"
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
