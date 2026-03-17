@@ -41,7 +41,7 @@ jobs:
             mesa-common-dev libpango1.0-dev \
             libpipewire-0.3-dev \
             wayland-protocols libwayland-dev \
-            xwayland wget
+            xwayland wget gobject-introspection libgirepository1.0-dev
 
       # 🔥 Ambil artifact dari workflow sebelumnya
       - name: "📥 Download GSD"
