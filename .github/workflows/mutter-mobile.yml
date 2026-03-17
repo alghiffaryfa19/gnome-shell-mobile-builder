@@ -12,7 +12,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+
+    container:
+      image: debian:trixie
 
     env:
       PKGVER: 48.0
@@ -21,15 +24,15 @@ jobs:
       GVDB_COMMIT: b54bc5da25127ef416858a3ad92e57159ff565b3
 
     steps:
-      - name: Install deps
+      - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y \
+          apt update
+          apt install -y \
             build-essential meson ninja-build pkg-config \
             libatk1.0-dev libcairo2-dev libdbus-1-dev \
             libfribidi-dev libgdk-pixbuf-2.0-dev \
-            libglib2.0-dev libgnome-desktop-3-dev \
-            libgraphene-1.0-dev libgtk-3-dev \
+            libglib2.0-dev libgnome-desktop-4-dev \
+            libgraphene-1.0-dev libgtk-4-dev \
             libjson-glib-dev liblcms2-dev \
             libcanberra-gtk3-dev libdrm-dev \
             libgudev-1.0-dev libinput-dev \
@@ -41,71 +44,48 @@ jobs:
             mesa-common-dev libpango1.0-dev \
             libpipewire-0.3-dev \
             wayland-protocols libwayland-dev \
-            xwayland wget gobject-introspection libgirepository1.0-dev
+            xwayland wget \
+            gobject-introspection libgirepository1.0-dev \
+            gettext
 
-      # 🔥 Ambil artifact dari workflow sebelumnya
-      - name: "📥 Download GSD"
-        id: download_gsd
-        run: |
-          
-          # 使用GitHub CLI下载Release文件
-          gh release download "gsd" \
-            --pattern "*gsd*.deb" \
-            --repo "${{ github.repository }}" \
-            --clobber
-          
-          # 验证下载的文件
-          DEB_COUNT=$(ls -1 *.deb 2>/dev/null | wc -l)
-          if [ $DEB_COUNT -eq 0 ]; then
-            echo "❌ 错误：未下载到任何内核包！"
-            exit 1
-          fi
-          
-          echo "✅ 成功下载 $DEB_COUNT 个内核包"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # ✅ Ambil dari workflow sebelumnya (artifact, bukan release)
+      - name: Download GSD artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: gsd
 
       - name: Install GSD
-        run: sudo dpkg -i gsd-mobile.deb || sudo apt -f install -y
+        run: |
+          dpkg -i *.deb || apt -f install -y
 
+      # ✅ Download source (explicit)
       - name: Download source
         run: |
-          # download (explicit)
           wget -O mutter.tar.gz \
             https://gitlab.gnome.org/verdre/mutter-mobile/-/archive/${COMMIT}/mutter-mobile-${COMMIT}.tar.gz
 
           wget -O gvdb.tar.gz \
             https://gitlab.gnome.org/GNOME/gvdb/-/archive/${GVDB_COMMIT}/gvdb-${GVDB_COMMIT}.tar.gz
 
-          # extract (NO wildcard)
+      # ✅ Extract aman
+      - name: Extract
+        run: |
           tar -xzf mutter.tar.gz
-
           mkdir gvdb
           tar -xzf gvdb.tar.gz -C gvdb --strip-components=1
 
+      # ✅ Prepare
       - name: Prepare
         run: |
           cd mutter-mobile-${COMMIT}
           mkdir -p subprojects/gvdb
           cp -r ../gvdb/* subprojects/gvdb/
 
-          ls -lah
-
-      - name: Build gsettings-desktop-schemas 48
-        run: |
-          wget -O gsettings.tar.xz \
-            https://download.gnome.org/sources/gsettings-desktop-schemas/48/gsettings-desktop-schemas-48.0.tar.xz
-
-          tar -xf gsettings.tar.xz
-          cd gsettings-desktop-schemas-48.0
-
-          meson setup build
-          meson compile -C build
-          sudo meson install -C build
-
+      # ✅ Build
       - name: Build
         run: |
           cd mutter-mobile-${COMMIT}
+
           meson setup build \
             -Dudev=true \
             -Dnative_backend=true \
@@ -116,11 +96,13 @@ jobs:
 
           meson compile -C build
 
+      # ✅ Install staging (tanpa sudo)
       - name: Install
         run: |
           cd mutter-mobile-${COMMIT}
           DESTDIR=$(pwd)/pkg meson install -C build
 
+      # ✅ Package .deb
       - name: Pack deb
         run: |
           mkdir -p deb/DEBIAN deb/usr
@@ -132,29 +114,13 @@ jobs:
           Architecture: amd64
           Maintainer: Newbyte
           Depends: gnome-settings-daemon-mobile
-          Description: Mutter Mobile
+          Description: Mutter Mobile (Debian Trixie build)
           EOF
 
           dpkg-deb --build deb mutter-mobile.deb
 
-      - name: "📤 上传构建产物"
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: mutter
           path: "*.deb"
-          retention-days: 7
-          if-no-files-found: error
-
-      - name: "🏷️ 创建GitHub Release"
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: mutter
-          name: "MUTTER"
-          body: |
-            🧩 MUTTER
-          draft: false
-          prerelease: false
-          files: "*.deb"
-          generate_release_notes: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
