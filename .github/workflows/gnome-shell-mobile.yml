@@ -10,6 +10,9 @@ on:
       - ".github/workflows/gnome-shell-mobile.yml"
   workflow_dispatch:
 
+permissions:
+  contents: write
+  
 jobs:
   build:
     runs-on: ubuntu-24.04
