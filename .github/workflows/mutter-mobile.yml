@@ -46,7 +46,7 @@ jobs:
             wayland-protocols libwayland-dev \
             xwayland wget \
             gobject-introspection libgirepository1.0-dev \
-            gettext
+            gettext git gh
 
       # ✅ Ambil dari workflow sebelumnya (artifact, bukan release)
       - name: "📥 Download GSD"
