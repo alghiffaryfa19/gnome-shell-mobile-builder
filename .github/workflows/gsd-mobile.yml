@@ -91,7 +91,7 @@ jobs:
           cat <<EOF > deb/DEBIAN/control
           Package: gnome-settings-daemon-mobile
           Version: ${PKGVER}-${PKGREL}
-          Architecture: amd64
+          Architecture: arm64
           Maintainer: Newbyte <newbyte@postmarketos.org>
           Depends: pulseaudio | pipewire-pulse
           Description: GNOME Settings Daemon Mobile (systemd)
