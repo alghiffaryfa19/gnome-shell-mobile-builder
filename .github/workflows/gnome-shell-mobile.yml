@@ -257,7 +257,7 @@ jobs:
           cat <<EOF > deb/DEBIAN/control
           Package: gnome-shell-mobile
           Version: ${PKGVER}-${PKGREL}
-          Architecture: amd64
+          Architecture: arm64
           Maintainer: Newbyte
           Depends: mutter-mobile, gnome-settings-daemon-mobile, pipewire-pulse | pulseaudio
           Description: GNOME Shell Mobile (systemd)
