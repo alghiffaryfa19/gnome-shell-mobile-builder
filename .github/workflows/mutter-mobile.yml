@@ -130,21 +130,7 @@ jobs:
       - name: Build
         run: |
 
-          # # fix pkg-config path
-          # export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
 
-          # # fix udev naming mismatch
-          # ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/libudev.pc \
-          #       /usr/lib/x86_64-linux-gnu/pkgconfig/udev.pc || true
-
-          # debug
-          pkg-config --modversion libudev || true
-
-          # fix udev pkg-config missing variable
-          echo "udevdir=/usr/lib/udev" >> /usr/lib/x86_64-linux-gnu/pkgconfig/libudev.pc
-
-          # optional debug
-          pkg-config --variable=udevdir libudev || true
 
           cd mutter-mobile-${COMMIT}
 
