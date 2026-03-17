@@ -207,6 +207,26 @@ jobs:
 
           pkg-config --modversion systemd || true
 
+          mkdir -p /usr/lib/x86_64-linux-gnu/pkgconfig
+
+          cat <<EOF | sudo tee /usr/lib/x86_64-linux-gnu/pkgconfig/systemd.pc
+          prefix=/usr
+          exec_prefix=\${prefix}
+          libdir=\${exec_prefix}/lib/x86_64-linux-gnu
+          includedir=\${prefix}/include
+
+          Name: systemd
+          Description: systemd
+          Version: 253
+          Libs: -lsystemd
+          Cflags: -I\${includedir}
+
+          systemduserunitdir=/usr/lib/systemd/user
+          systemdsystemunitdir=/usr/lib/systemd/system
+          EOF
+
+          pkg-config --variable=systemduserunitdir systemd
+
           meson setup build \
             --prefix=/usr \
             -Dsystemd=true \
