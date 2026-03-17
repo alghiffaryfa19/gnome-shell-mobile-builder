@@ -60,7 +60,22 @@ jobs:
             gsettings-desktop-schemas-dev \
             gjs \
             pulseaudio pipewire-pulse \
-            xcvt gh libatk1.0-dev libatk-bridge2.0-dev
+            xcvt gh libatk1.0-dev libatk-bridge2.0-dev \
+            libcolord-dev \
+            liblcms2-dev \
+            libei-dev \
+            libdisplay-info-dev \
+            libcanberra-gtk3-dev \
+            libgudev-1.0-dev \
+            libwacom-dev \
+            libx11-xcb-dev \
+            libxcb-res0-dev \
+            libxcb-randr0-dev \
+            libxkbfile-dev \
+            libxkbcommon-x11-dev \
+            libinput-dev \
+            libgbm-dev \
+            libdrm-dev
 
       # 🔥 Download MUTTER
       - name: "📥 Download MUTTER"
