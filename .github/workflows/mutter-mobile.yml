@@ -149,6 +149,7 @@ jobs:
           cd mutter-mobile-${COMMIT}
 
           meson setup build \
+            --prefix=/usr \
             -Dudev=true \
             -Dnative_backend=true \
             -Dintrospection=true \
