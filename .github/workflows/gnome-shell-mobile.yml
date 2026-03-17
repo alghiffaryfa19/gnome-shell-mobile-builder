@@ -103,6 +103,11 @@ jobs:
         run: |
           sudo dpkg -i *.deb || sudo apt -f install -y
 
+      - name: Fix pkg-config path
+        run: |
+          export PKG_CONFIG_PATH=/usr/local/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
+          echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH" >> $GITHUB_ENV
+
       - name: Download source
         run: |
           wget -O gnome-shell-mobile.tar.gz https://gitlab.gnome.org/verdre/gnome-shell-mobile/-/archive/${COMMIT}/gnome-shell-mobile-${COMMIT}.tar.gz
