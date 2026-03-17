@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: write
-  
+
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -71,6 +71,7 @@ jobs:
           cd gnome-settings-daemon-mobile-${COMMIT}
 
           meson setup build \
+            --prefix=/usr \
             -Dsystemd=true \
             -Delogind=false
 
@@ -93,7 +94,7 @@ jobs:
           Version: ${PKGVER}-${PKGREL}
           Architecture: amd64
           Maintainer: Newbyte <newbyte@postmarketos.org>
-          Depends: pulseaudio
+          Depends: pulseaudio | pipewire-pulse
           Description: GNOME Settings Daemon Mobile (systemd)
           EOF
 

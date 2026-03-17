@@ -54,7 +54,7 @@ jobs:
             libpulse-dev libasound2-dev \
             libadwaita-1-dev \
             gsettings-desktop-schemas-dev \
-            python3 gjs gettext unzip wget
+            python3 gjs gettext unzip wget pulseaudio pipewire-pulse
 
       # 🔥 Ambil dependency hasil build sebelumnya
       - name: "📥 Download MUTTER"

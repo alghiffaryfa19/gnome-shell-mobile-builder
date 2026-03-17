@@ -130,12 +130,12 @@ jobs:
       - name: Build
         run: |
 
-          # fix pkg-config path
-          export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
+          # # fix pkg-config path
+          # export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
 
-          # fix udev naming mismatch
-          ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/libudev.pc \
-                /usr/lib/x86_64-linux-gnu/pkgconfig/udev.pc || true
+          # # fix udev naming mismatch
+          # ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/libudev.pc \
+          #       /usr/lib/x86_64-linux-gnu/pkgconfig/udev.pc || true
 
           # debug
           pkg-config --modversion libudev || true
