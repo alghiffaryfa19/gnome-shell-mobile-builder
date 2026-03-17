@@ -116,7 +116,7 @@ jobs:
             xserver-xorg-dev xwayland \
             gettext wget libxkbcommon-x11-dev libgbm-dev libsysprof-6-dev libgl-dev \
             libegl-dev libgles2-mesa-dev libglvnd-dev libwayland-egl-backend-dev xkb-data libxcb-randr0-dev libsysprof-capture-4-dev libevdev-dev sysprof \
-            xcvt libnm-dev libsecret-1-dev
+            xcvt libnm-dev libsecret-1-dev libsystemd-dev
 
       # 🔥 Download MUTTER
       - name: "📥 Download MUTTER"
@@ -200,6 +200,12 @@ jobs:
           export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
 
           cd gnome-shell-mobile-${COMMIT}
+
+          # fix systemd pkg-config name mismatch
+          ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/libsystemd.pc \
+                /usr/lib/x86_64-linux-gnu/pkgconfig/systemd.pc || true
+
+          pkg-config --modversion systemd || true
 
           meson setup build \
             --prefix=/usr \
