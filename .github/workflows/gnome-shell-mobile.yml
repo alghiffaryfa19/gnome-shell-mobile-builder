@@ -116,7 +116,7 @@ jobs:
             xserver-xorg-dev xwayland \
             gettext wget libxkbcommon-x11-dev libgbm-dev libsysprof-6-dev libgl-dev \
             libegl-dev libgles2-mesa-dev libglvnd-dev libwayland-egl-backend-dev xkb-data libxcb-randr0-dev libsysprof-capture-4-dev libevdev-dev sysprof \
-            xcvt libnm-dev libsecret-1-dev libsystemd-dev systemd-dev
+            xcvt libnm-dev libsecret-1-dev libsystemd-dev systemd-dev libgnome-autoar-0-dev
 
       # 🔥 Download MUTTER
       - name: "📥 Download MUTTER"
