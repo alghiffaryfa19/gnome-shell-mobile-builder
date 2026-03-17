@@ -3,9 +3,8 @@ name: Build GNOME Shell Mobile (.deb)
 on:
   workflow_run:
     workflows: ["Build Mutter Mobile (.deb)"]
-    types: [completed]
-
-on:
+    types:
+      - completed
   push:
     paths:
       - ".github/workflows/gnome-shell-mobile.yml"
