@@ -46,7 +46,7 @@ jobs:
         run: |
           
           # 使用GitHub CLI下载Release文件
-          gh release download "MUTTER" \
+          gh release download "mutter" \
             --pattern "*mutter*.deb" \
             --repo "${{ github.repository }}" \
             --clobber
@@ -67,7 +67,7 @@ jobs:
         run: |
           
           # 使用GitHub CLI下载Release文件
-          gh release download "GSD" \
+          gh release download "gsd" \
             --pattern "*gsd*.deb" \
             --repo "${{ github.repository }}" \
             --clobber
