@@ -49,7 +49,24 @@ jobs:
             gettext git gh libnm-dev libnma-dev libcolord-dev gettext intltool cmake \
             libei-dev libeis-dev libdisplay-info-dev libseat-dev libliftoff-dev libx11-xcb-dev \
             libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libxcb-res0-dev \
-            libxcb-randr0-dev libxcb-sync-dev
+            libxcb-randr0-dev libxcb-sync-dev build-essential meson ninja-build pkg-config cmake \
+            libatspi2.0-dev libcairo2-dev libdbus-1-dev libudev-dev libfribidi-dev libgdk-pixbuf-2.0-dev \
+            libglib2.0-dev libgnome-desktop-4-dev libgirepository1.0-dev gobject-introspection \
+            libgraphene-1.0-dev libgtk-4-dev libjson-glib-dev liblcms2-dev \
+            libcanberra-gtk3-dev libdisplay-info-dev libdrm-dev \
+            libei-dev libgudev-1.0-dev libinput-dev libwacom-dev \
+            libice-dev libsm-dev libx11-dev libxau-dev libxcb1-dev \
+            libxcomposite-dev libxcursor-dev libxdamage-dev \
+            libxext-dev libxfixes-dev libxi-dev libxinerama-dev \
+            libxkbcommon-dev libxkbfile-dev libxrandr-dev \
+            libxrender-dev libxtst-dev \
+            mesa-common-dev libpango1.0-dev \
+            libpipewire-0.3-dev \
+            libwayland-dev wayland-protocols \
+            python3-argcomplete python3-docutils \
+            libstartup-notification0-dev \
+            xserver-xorg-dev xwayland \
+            gettext wget
 
       # ✅ Ambil dari workflow sebelumnya (artifact, bukan release)
       - name: "📥 Download GSD"
