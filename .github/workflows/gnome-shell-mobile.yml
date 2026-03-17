@@ -12,7 +12,7 @@ on:
 
 permissions:
   contents: write
-  
+
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -41,7 +41,20 @@ jobs:
             libgnome-desktop-3-dev \
             gobject-introspection \
             python3 python3-setuptools \
-            wget
+            wget build-essential meson ninja-build pkg-config \
+            libglib2.0-dev libgirepository1.0-dev gobject-introspection \
+            libgtk-4-dev libgjs-dev libxml2-dev \
+            libpolkit-agent-1-dev libgnome-desktop-4-dev \
+            libpango1.0-dev libecal-2.0-dev libedataserver1.2-dev \
+            libgcr-4-dev \
+            libx11-dev \
+            libnm-dev libsecret-1-dev \
+            libpipewire-0.3-dev \
+            libsystemd-dev systemd \
+            libpulse-dev libasound2-dev \
+            libadwaita-1-dev \
+            gsettings-desktop-schemas-dev \
+            python3 gjs gettext unzip wget
 
       # 🔥 Ambil dependency hasil build sebelumnya
       - name: "📥 Download MUTTER"
