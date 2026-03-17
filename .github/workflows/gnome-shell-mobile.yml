@@ -41,15 +41,47 @@ jobs:
             wget
 
       # 🔥 Ambil dependency hasil build sebelumnya
-      - name: Download mutter
-        uses: actions/download-artifact@v4
-        with:
-          name: mutter-deb
+      - name: "📥 Download MUTTER"
+        id: download_mutter
+        run: |
+          
+          # 使用GitHub CLI下载Release文件
+          gh release download "MUTTER" \
+            --pattern "*mutter*.deb" \
+            --repo "${{ github.repository }}" \
+            --clobber
+          
+          # 验证下载的文件
+          DEB_COUNT=$(ls -1 *.deb 2>/dev/null | wc -l)
+          if [ $DEB_COUNT -eq 0 ]; then
+            echo "❌ 错误：未下载到任何内核包！"
+            exit 1
+          fi
+          
+          echo "✅ 成功下载 $DEB_COUNT 个内核包"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Download gsd
-        uses: actions/download-artifact@v4
-        with:
-          name: gsd-deb
+      - name: "📥 Download GSD"
+        id: download_gsd
+        run: |
+          
+          # 使用GitHub CLI下载Release文件
+          gh release download "GSD" \
+            --pattern "*gsd*.deb" \
+            --repo "${{ github.repository }}" \
+            --clobber
+          
+          # 验证下载的文件
+          DEB_COUNT=$(ls -1 *.deb 2>/dev/null | wc -l)
+          if [ $DEB_COUNT -eq 0 ]; then
+            echo "❌ 错误：未下载到任何内核包！"
+            exit 1
+          fi
+          
+          echo "✅ 成功下载 $DEB_COUNT 个内核包"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies (local deb)
         run: |
@@ -104,8 +136,24 @@ jobs:
 
           dpkg-deb --build deb gnome-shell-mobile.deb
 
-      - name: Upload artifact
+      - name: "📤 上传构建产物"
         uses: actions/upload-artifact@v4
         with:
-          name: gnome-shell-deb
-          path: gnome-shell-mobile.deb
+          name: gnome-shell
+          path: "*.deb"
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: "🏷️ 创建GitHub Release"
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: gnome_shell_mobile
+          name: "GSM"
+          body: |
+            🧩 GSM
+          draft: false
+          prerelease: false
+          files: "*.deb"
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
