@@ -60,7 +60,7 @@ jobs:
             gsettings-desktop-schemas-dev \
             gjs \
             pulseaudio pipewire-pulse \
-            xcvt gh libatk1.0-dev
+            xcvt gh libatk1.0-dev libatk-bridge2.0-dev
 
       # 🔥 Download MUTTER
       - name: "📥 Download MUTTER"
