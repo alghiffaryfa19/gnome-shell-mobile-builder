@@ -46,7 +46,8 @@ jobs:
             wayland-protocols libwayland-dev \
             xwayland wget \
             gobject-introspection libgirepository1.0-dev \
-            gettext git gh libnm-dev libnma-dev libcolord-dev gettext intltool
+            gettext git gh libnm-dev libnma-dev libcolord-dev gettext intltool cmake \
+            libei-dev
 
       # ✅ Ambil dari workflow sebelumnya (artifact, bukan release)
       - name: "📥 Download GSD"
