@@ -102,7 +102,6 @@ jobs:
       - name: Install dependencies (local deb)
         run: |
           sudo dpkg -i *.deb || sudo apt -f install -y
-          find / -name "mutter-clutter-16.pc" 2>/dev/null
 
       - name: Download source
         run: |
