@@ -75,7 +75,7 @@ jobs:
             libxkbcommon-x11-dev \
             libinput-dev \
             libgbm-dev \
-            libdrm-dev
+            libdrm-dev libeis-dev
 
       # 🔥 Download MUTTER
       - name: "📥 Download MUTTER"
