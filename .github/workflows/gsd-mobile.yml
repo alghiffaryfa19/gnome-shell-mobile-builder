@@ -38,12 +38,15 @@ jobs:
             gnome-settings-daemon
 
       # ✅ DOWNLOAD (EXPLICIT, NO WILDCARD)
-      - name: Download source
+      - name: Clone source
         run: |
-          wget -O gsd.tar.gz \
-            https://gitlab.gnome.org/verdre/gnome-settings-daemon-mobile/-/archive/${COMMIT}/gnome-settings-daemon-mobile-${COMMIT}.tar.gz
+          git clone --recursive \
+            https://gitlab.gnome.org/verdre/gnome-settings-daemon-mobile.git -b gnome-48-mobile \
+            gnome-settings-daemon-mobile-${COMMIT}
 
-          ls -lah
+          cd gnome-settings-daemon-mobile-${COMMIT}
+          git checkout ${COMMIT}
+          git submodule update --init --recursive
 
       # ✅ EXTRACT AMAN
       - name: Extract
