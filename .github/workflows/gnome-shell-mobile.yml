@@ -96,9 +96,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # 🔥 Install dependency deb
-      - name: Install local deb
+      - name: Install GSD
         run: |
-          dpkg -i *.deb || apt -f install -y
+          apt-get install -y ./*.deb \
+            -o Dpkg::Options::="--force-overwrite"
 
       # 🔍 Debug (penting)
       - name: Verify mutter pkg-config
