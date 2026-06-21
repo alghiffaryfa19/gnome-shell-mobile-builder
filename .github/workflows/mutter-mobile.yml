@@ -36,7 +36,7 @@ jobs:
             build-essential \
             meson \
             ninja-build \
-            pkg-config
+            pkg-config gh
 
           apt-get build-dep -y \
             gnome-shell \
