@@ -5,8 +5,6 @@ on:
     workflows: ["Build Mutter Mobile (.deb)"]
     types:
       - completed
-    paths:
-      - ".github/workflows/gnome-shell-mobile.yml"
   workflow_dispatch:
 
 permissions:
@@ -20,23 +18,30 @@ jobs:
       image: debian:trixie
 
     env:
-      PKGVER: 48.0
+      # Pakai versi lebih tinggi dari paket Debian agar tidak dianggap downgrade saat nanti diinstall
+      PKGVER: 48.4+mobile.0
       PKGREL: 6
       COMMIT: 48.mobile.0
       GVC_COMMIT: 47c47a423ff2f55bb038d92517e4782cf051496a
 
     steps:
-      # 🔹 Base tools
       - name: Install base tools
         run: |
-          apt update
-          apt install -y \
-            git wget curl ca-certificates gnupg
+          apt-get update
 
-      # 🔹 Build dependencies (Trixie)
-      - name: Install dependencies
+          apt-get install -y \
+            git \
+            wget \
+            curl \
+            ca-certificates \
+            gnupg \
+            gh
+
+      - name: Install build dependencies
         run: |
-          sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
+          if [ -f /etc/apt/sources.list.d/debian.sources ]; then
+            sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
+          fi
 
           apt-get update
 
@@ -44,187 +49,169 @@ jobs:
             build-essential \
             meson \
             ninja-build \
-            pkg-config git gh
+            pkg-config \
+            cmake \
+            git \
+            gh
 
           apt-get build-dep -y \
             gnome-shell \
             mutter \
             gnome-settings-daemon
 
-      # 🔥 Download MUTTER
-      - name: "📥 Download MUTTER"
-        id: download_mutter
+      - name: Download Mutter Mobile deb
         run: |
-          
-          # 使用GitHub CLI下载Release文件
+          mkdir -p deps/mutter
+
           gh release download "mutter" \
             --pattern "*mutter*.deb" \
             --repo "${{ github.repository }}" \
+            --dir deps/mutter \
             --clobber
-          
-          # 验证下载的文件
-          DEB_COUNT=$(ls -1 *.deb 2>/dev/null | wc -l)
-          if [ $DEB_COUNT -eq 0 ]; then
-            echo "❌ 错误：未下载到任何内核包！"
+
+          echo "Downloaded Mutter packages:"
+          ls -lah deps/mutter
+
+          DEB_COUNT=$(ls -1 deps/mutter/*.deb 2>/dev/null | wc -l)
+
+          if [ "$DEB_COUNT" -eq 0 ]; then
+            echo "Error: no Mutter .deb downloaded"
             exit 1
           fi
-          
-          echo "✅ 成功下载 $DEB_COUNT 个内核包"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 🔥 Download GSD
-      - name: "📥 Download GSD"
-        id: download_gsd
+      - name: Download GSD Mobile deb
         run: |
-          
-          # 使用GitHub CLI下载Release文件
+          mkdir -p deps/gsd
+
           gh release download "gsd" \
             --pattern "*gsd*.deb" \
             --repo "${{ github.repository }}" \
+            --dir deps/gsd \
             --clobber
-          
-          # 验证下载的文件
-          DEB_COUNT=$(ls -1 *.deb 2>/dev/null | wc -l)
-          if [ $DEB_COUNT -eq 0 ]; then
-            echo "❌ 错误：未下载到任何内核包！"
+
+          echo "Downloaded GSD packages:"
+          ls -lah deps/gsd
+
+          DEB_COUNT=$(ls -1 deps/gsd/*.deb 2>/dev/null | wc -l)
+
+          if [ "$DEB_COUNT" -eq 0 ]; then
+            echo "Error: no GSD .deb downloaded"
             exit 1
           fi
-          
-          echo "✅ 成功下载 $DEB_COUNT 个内核包"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 🔥 Install dependency deb
       - name: Install GSD and Mutter Mobile
         run: |
-          ls -lah *.deb
-
-          echo "Install GSD first"
-          apt-get install -y ./gsd*.deb \
-            --allow-downgrades \
-            -o Dpkg::Options::="--force-overwrite"
-
-          PC_FILE="$(pkg-config --variable=pcfiledir gnome-settings-daemon)/gnome-settings-daemon.pc"
-          sed -i 's/^Version:.*/Version: 48.mobile.0/' "$PC_FILE"
-
-          echo "Install Mutter"
-          apt-get install -y ./mutter*.deb \
-            --allow-downgrades \
-            -o Dpkg::Options::="--force-overwrite"
-
-          echo "Verify versions:"
-          pkg-config --modversion gnome-settings-daemon
-          pkg-config --modversion libmutter-16
-          pkg-config --modversion mutter-clutter-16
-
-          test "$(pkg-config --modversion gnome-settings-daemon)" = "48.mobile.0"
-          test "$(pkg-config --modversion libmutter-16)" = "48.mobile.0"
-
-      - name: Install dependency debs
-        run: |
-          ls -lah *.deb
-
-          for deb in *.deb; do
+          echo "GSD packages:"
+          for deb in deps/gsd/*.deb; do
             echo "== $deb =="
             dpkg-deb -f "$deb" Package Version Architecture || true
           done
 
-          apt-get install -y ./*.deb \
+          echo "Mutter packages:"
+          for deb in deps/mutter/*.deb; do
+            echo "== $deb =="
+            dpkg-deb -f "$deb" Package Version Architecture || true
+          done
+
+          echo "Install GSD Mobile first"
+          apt-get install -y ./deps/gsd/*.deb \
             --allow-downgrades \
             -o Dpkg::Options::="--force-overwrite"
 
-          echo "Before patch:"
-          pkg-config --modversion gnome-settings-daemon || true
-          pkg-config --variable=pcfiledir gnome-settings-daemon || true
+          echo "Install Mutter Mobile"
+          apt-get install -y ./deps/mutter/*.deb \
+            --allow-downgrades \
+            -o Dpkg::Options::="--force-overwrite"
 
-          PC_FILE="$(pkg-config --variable=pcfiledir gnome-settings-daemon)/gnome-settings-daemon.pc"
+          mkdir -p /tmp/mobile-pkgconfig
 
-          echo "Using PC file: $PC_FILE"
-          cat "$PC_FILE"
+          echo "Create gnome-settings-daemon.pc override"
+          GSD_PC="$(pkg-config --path gnome-settings-daemon)"
 
-          sed -i 's/^Version:.*/Version: 48.mobile.0/' "$PC_FILE"
+          echo "Original GSD pc file: $GSD_PC"
+          cat "$GSD_PC"
 
-          echo "After patch:"
-          cat "$PC_FILE"
-          pkg-config --modversion gnome-settings-daemon
+          cp "$GSD_PC" /tmp/mobile-pkgconfig/gnome-settings-daemon.pc
+          sed -i 's/^Version:.*/Version: 48.mobile.0/' /tmp/mobile-pkgconfig/gnome-settings-daemon.pc
 
-          test "$(pkg-config --modversion gnome-settings-daemon)" = "48.mobile.0"
+          echo "Create systemd.pc override"
+          cat > /tmp/mobile-pkgconfig/systemd.pc <<'EOF'
+          prefix=/usr
+          exec_prefix=${prefix}
+          libdir=${exec_prefix}/lib/aarch64-linux-gnu
+          includedir=${prefix}/include
 
-      # 🔍 Debug (penting)
-      - name: Verify pkg-config deps
-        run: |
+          Name: systemd
+          Description: systemd
+          Version: 257
+          Libs: -lsystemd
+          Cflags: -I${includedir}
+
+          systemduserunitdir=/usr/lib/systemd/user
+          systemdsystemunitdir=/usr/lib/systemd/system
+          EOF
+
+          echo "PKG_CONFIG_PATH=/tmp/mobile-pkgconfig:/usr/lib/aarch64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig" >> "$GITHUB_ENV"
+
+          export PKG_CONFIG_PATH=/tmp/mobile-pkgconfig:/usr/lib/aarch64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
+
+          echo "Verify pkg-config after override:"
+          pkg-config --path gnome-settings-daemon
           pkg-config --modversion gnome-settings-daemon
           pkg-config --modversion libmutter-16
           pkg-config --modversion mutter-clutter-16
           pkg-config --modversion mutter-mtk-16
           pkg-config --modversion mutter-cogl-16
+          pkg-config --variable=systemduserunitdir systemd
 
-          pkg-config --cflags libmutter-16
+          test "$(pkg-config --modversion gnome-settings-daemon)" = "48.mobile.0"
+          test "$(pkg-config --modversion libmutter-16)" = "48.mobile.0"
 
-      # 🔥 Download source
-      # - name: Download source
-      #   run: |
-      #     wget -O gnome-shell-mobile.tar.gz \
-      #       https://gitlab.gnome.org/verdre/gnome-shell-mobile/-/archive/${COMMIT}/gnome-shell-mobile-${COMMIT}.tar.gz
-
-      #     wget -O gvc.tar.gz \
-      #       https://gitlab.gnome.org/GNOME/libgnome-volume-control/-/archive/${GVC_COMMIT}/libgnome-volume-control-${GVC_COMMIT}.tar.gz
-
-      #     tar -xzf gnome-shell-mobile.tar.gz
-
-      #     mkdir gvc
-      #     tar -xzf gvc.tar.gz -C gvc --strip-components=1
-
-      - name: Clone source
+      - name: Clone GNOME Shell Mobile source
         run: |
           git clone --recursive \
-            https://gitlab.gnome.org/verdre/gnome-shell-mobile.git -b gnome-48-mobile \
+            https://gitlab.gnome.org/verdre/gnome-shell-mobile.git \
+            -b gnome-48-mobile \
             gnome-shell-mobile-${COMMIT}
 
           cd gnome-shell-mobile-${COMMIT}
           git checkout ${COMMIT}
           git submodule update --init --recursive
 
-      # 🔧 Prepare
-      # - name: Prepare
-      #   run: |
-      #     cd gnome-shell-mobile-${COMMIT}
-      #     mkdir -p subprojects/gvc
-      #     cp -r ../gvc/* subprojects/gvc/
-
-      # 🚀 Build
-      - name: Build
+      - name: Verify pkg-config dependencies
         run: |
-          export PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
+          export PKG_CONFIG_PATH=/tmp/mobile-pkgconfig:/usr/lib/aarch64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
+
+          echo "GSD:"
+          pkg-config --path gnome-settings-daemon
+          pkg-config --modversion gnome-settings-daemon
+
+          echo "Mutter:"
+          pkg-config --modversion libmutter-16
+          pkg-config --modversion mutter-clutter-16
+          pkg-config --modversion mutter-mtk-16
+          pkg-config --modversion mutter-cogl-16
+
+          echo "Systemd:"
+          pkg-config --modversion systemd
+          pkg-config --variable=systemduserunitdir systemd
+          pkg-config --variable=systemdsystemunitdir systemd
+
+          echo "libmutter cflags:"
+          pkg-config --cflags libmutter-16
+
+          test "$(pkg-config --modversion gnome-settings-daemon)" = "48.mobile.0"
+          test "$(pkg-config --modversion libmutter-16)" = "48.mobile.0"
+
+      - name: Build GNOME Shell Mobile
+        run: |
+          export PKG_CONFIG_PATH=/tmp/mobile-pkgconfig:/usr/lib/aarch64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
 
           cd gnome-shell-mobile-${COMMIT}
-
-          # fix systemd pkg-config name mismatch
-          ln -s /usr/lib/aarch64-linux-gnu/pkgconfig/libsystemd.pc \
-                /usr/lib/aarch64-linux-gnu/pkgconfig/systemd.pc || true
-
-          pkg-config --modversion systemd || true
-
-          mkdir -p /usr/lib/aarch64-linux-gnu/pkgconfig
-
-          cat <<EOF | tee /usr/lib/aarch64-linux-gnu/pkgconfig/systemd.pc
-          prefix=/usr
-          exec_prefix=\${prefix}
-          libdir=\${exec_prefix}/lib/aarch64-linux-gnu
-          includedir=\${prefix}/include
-
-          Name: systemd
-          Description: systemd
-          Version: 253
-          Libs: -lsystemd
-          Cflags: -I\${includedir}
-
-          systemduserunitdir=/usr/lib/systemd/user
-          systemdsystemunitdir=/usr/lib/systemd/system
-          EOF
-
-          pkg-config --variable=systemduserunitdir systemd
 
           meson setup build \
             --prefix=/usr \
@@ -235,48 +222,56 @@ jobs:
 
           meson compile -C build
 
-      # 📦 Install
-      - name: Install
+      - name: Install to staging
         run: |
           cd gnome-shell-mobile-${COMMIT}
-          DESTDIR=$(pwd)/pkg meson install -C build
+          DESTDIR="$(pwd)/pkg" meson install -C build
 
-      # 🧹 Cleanup
-      - name: Cleanup
+      - name: Cleanup staging
         run: |
           cd gnome-shell-mobile-${COMMIT}
+
           rm -f pkg/usr/share/applications/org.gnome.Extensions.desktop || true
 
-      # 📦 Create DEB
       - name: Create DEB
         run: |
           mkdir -p deb/DEBIAN deb/usr
+
           cp -r gnome-shell-mobile-${COMMIT}/pkg/usr/* deb/usr/
 
-          cat <<EOF > deb/DEBIAN/control
+          cat > deb/DEBIAN/control <<EOF
           Package: gnome-shell
           Version: ${PKGVER}-${PKGREL}
           Architecture: arm64
           Maintainer: Newbyte
           Depends: mutter, gnome-settings-daemon, pipewire-pulse | pulseaudio
-          Description: GNOME Shell Mobile (systemd)
+          Provides: gnome-shell-mobile
+          Replaces: gnome-shell
+          Conflicts: gnome-shell
+          Description: GNOME Shell Mobile
+           GNOME Shell Mobile build for Debian Trixie.
           EOF
 
           dpkg-deb --build deb gnome-shell-mobile.deb
 
-      # 📤 Upload artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: gnome-shell
           path: "*.deb"
+          retention-days: 7
+          if-no-files-found: error
 
-      # 🏷️ Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: gnome-shell-${{ github.run_number }}
           name: GNOME Shell Mobile
+          body: |
+            GNOME Shell Mobile build.
+          draft: false
+          prerelease: false
           files: "*.deb"
+          generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
