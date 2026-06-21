@@ -23,18 +23,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y \
-            build-essential meson ninja-build pkg-config \
-            libasound2-dev libcolord-dev libcups2-dev \
-            libgeoclue-2-dev libgeocode-glib-dev \
-            liblcms2-dev libcanberra-gtk3-dev \
-            libnotify-dev libwacom-dev \
-            libnss3-dev libpango1.0-dev \
-            libpolkit-gobject-1-dev libpulse-dev \
-            libupower-glib-dev libgcr-4-dev \
-            libglib2.0-dev libgnome-desktop-3-dev \
-            libgtk-3-dev libxml2-utils wget libgweather-4-dev libmm-glib-dev \
-            libnm-dev libnma-dev libcolord-dev gettext intltool
+          sudo apt install -y build-essential meson ninja-build pkg-config
+          sudo apt build-dep gnome-shell mutter gnome-settings-daemon
 
       # ✅ DOWNLOAD (EXPLICIT, NO WILDCARD)
       - name: Download source
@@ -42,28 +32,14 @@ jobs:
           wget -O gsd.tar.gz \
             https://gitlab.gnome.org/verdre/gnome-settings-daemon-mobile/-/archive/${COMMIT}/gnome-settings-daemon-mobile-${COMMIT}.tar.gz
 
-          wget -O gvc.tar.gz \
-            https://gitlab.gnome.org/GNOME/libgnome-volume-control/-/archive/${GVC_COMMIT}/libgnome-volume-control-${GVC_COMMIT}.tar.gz
-
           ls -lah
 
       # ✅ EXTRACT AMAN
       - name: Extract
         run: |
           tar -xzf gsd.tar.gz
-          mkdir gvc
-          tar -xzf gvc.tar.gz -C gvc --strip-components=1
-
           ls -lah
 
-      # ✅ PREPARE (ANTI ERROR)
-      - name: Prepare
-        run: |
-          cd gnome-settings-daemon-mobile-${COMMIT}
-
-          rm -rf subprojects/gvc
-          mkdir -p subprojects/gvc
-          cp -r ../gvc/* subprojects/gvc/
 
       # ✅ BUILD (SYSTEMD)
       - name: Build
@@ -72,6 +48,7 @@ jobs:
 
           meson setup build \
             -Dsystemd=true \
+            -Db_lto=true \
             -Delogind=false
 
           meson compile -C build
