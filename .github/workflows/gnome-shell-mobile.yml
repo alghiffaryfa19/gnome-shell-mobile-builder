@@ -96,15 +96,71 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # 🔥 Install dependency deb
-      - name: Install GSD
+      - name: Install GSD and Mutter Mobile
         run: |
-          apt-get install -y ./*.deb --allow-downgrades -o Dpkg::Options::="--force-overwrite"
+          ls -lah *.deb
+
+          echo "Install GSD first"
+          apt-get install -y ./gsd*.deb \
+            --allow-downgrades \
+            -o Dpkg::Options::="--force-overwrite"
+
+          PC_FILE="$(pkg-config --variable=pcfiledir gnome-settings-daemon)/gnome-settings-daemon.pc"
+          sed -i 's/^Version:.*/Version: 48.mobile.0/' "$PC_FILE"
+
+          echo "Install Mutter"
+          apt-get install -y ./mutter*.deb \
+            --allow-downgrades \
+            -o Dpkg::Options::="--force-overwrite"
+
+          echo "Verify versions:"
+          pkg-config --modversion gnome-settings-daemon
+          pkg-config --modversion libmutter-16
+          pkg-config --modversion mutter-clutter-16
+
+          test "$(pkg-config --modversion gnome-settings-daemon)" = "48.mobile.0"
+          test "$(pkg-config --modversion libmutter-16)" = "48.mobile.0"
+
+      - name: Install dependency debs
+        run: |
+          ls -lah *.deb
+
+          for deb in *.deb; do
+            echo "== $deb =="
+            dpkg-deb -f "$deb" Package Version Architecture || true
+          done
+
+          apt-get install -y ./*.deb \
+            --allow-downgrades \
+            -o Dpkg::Options::="--force-overwrite"
+
+          echo "Before patch:"
+          pkg-config --modversion gnome-settings-daemon || true
+          pkg-config --variable=pcfiledir gnome-settings-daemon || true
+
+          PC_FILE="$(pkg-config --variable=pcfiledir gnome-settings-daemon)/gnome-settings-daemon.pc"
+
+          echo "Using PC file: $PC_FILE"
+          cat "$PC_FILE"
+
+          sed -i 's/^Version:.*/Version: 48.mobile.0/' "$PC_FILE"
+
+          echo "After patch:"
+          cat "$PC_FILE"
+          pkg-config --modversion gnome-settings-daemon
+
+          test "$(pkg-config --modversion gnome-settings-daemon)" = "48.mobile.0"
 
       # 🔍 Debug (penting)
-      - name: Verify mutter pkg-config
+      - name: Verify pkg-config deps
         run: |
-          pkg-config --list-all | grep mutter || true
+          pkg-config --modversion gnome-settings-daemon
+          pkg-config --modversion libmutter-16
           pkg-config --modversion mutter-clutter-16
+          pkg-config --modversion mutter-mtk-16
+          pkg-config --modversion mutter-cogl-16
+
+          pkg-config --cflags libmutter-16
 
       # 🔥 Download source
       # - name: Download source
