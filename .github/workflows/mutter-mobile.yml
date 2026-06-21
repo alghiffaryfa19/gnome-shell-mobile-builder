@@ -40,8 +40,9 @@ jobs:
 
           apt-get build-dep -y \
             gnome-shell \
-            mutter \
-            gnome-settings-daemon
+            mutter
+
+          apt remove -y gnome-settings-daemon
 
           mkdir -p /usr/share/dbus-1/interfaces
           ln -s /usr/share/dbus-1/interfaces/org.gnome.Sysprof.Profiler.xml \
