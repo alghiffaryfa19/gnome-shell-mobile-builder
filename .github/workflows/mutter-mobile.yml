@@ -40,9 +40,8 @@ jobs:
 
           apt-get build-dep -y \
             gnome-shell \
-            mutter
-
-          apt remove -y gnome-settings-daemon
+            mutter \
+            gnome-settings-daemon
 
           mkdir -p /usr/share/dbus-1/interfaces
           ln -s /usr/share/dbus-1/interfaces/org.gnome.Sysprof.Profiler.xml \
@@ -72,7 +71,10 @@ jobs:
 
       - name: Install GSD
         run: |
-          dpkg -i *.deb || apt -f install -y
+          apt-get install -y ./*.deb \
+            -o Dpkg::Options::="--force-overwrite"
+
+          pkg-config --modversion gnome-settings-daemon || true
 
       # ✅ Download source (explicit)
       # - name: Download source
