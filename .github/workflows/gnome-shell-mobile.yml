@@ -98,8 +98,7 @@ jobs:
       # 🔥 Install dependency deb
       - name: Install GSD
         run: |
-          apt-get install -y ./*.deb \
-            -o Dpkg::Options::="--force-overwrite"
+          apt-get install -y ./*.deb --allow-downgrades -o Dpkg::Options::="--force-overwrite"
 
       # 🔍 Debug (penting)
       - name: Verify mutter pkg-config
