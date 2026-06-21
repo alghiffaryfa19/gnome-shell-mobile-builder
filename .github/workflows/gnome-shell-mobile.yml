@@ -36,7 +36,7 @@ jobs:
       # 🔹 Build dependencies (Trixie)
       - name: Install dependencies
         run: |
-          sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+          # sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
 
           apt-get update
 
