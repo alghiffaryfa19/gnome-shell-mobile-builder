@@ -30,3 +30,12 @@ Please follow the guide carefully
     sudo systemctl start gdm
     sudo reboot
 	```
+
+# Tips if you use Gnome Shell Mobile on Tablet
+1. Use gnome extensions to force phone mode, you can follow the guide [Here](https://github.com/vixalien/force-phone-mode)
+
+# Screenshot
+<div align="center">
+  <img src="gnomeshellmobile.jpeg" alt="Gnome-Shell-Mobile"/>
+  <p><em>Xiaomi Pad 6s Pro (Sheng) and Nothing Phone 1 (Spacewar) with GNOME Shell Mobile on Debian 13</em></p>
+</div>
