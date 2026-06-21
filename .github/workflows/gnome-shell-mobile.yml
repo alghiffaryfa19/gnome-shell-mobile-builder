@@ -203,7 +203,7 @@ jobs:
           Version: ${PKGVER}-${PKGREL}
           Architecture: arm64
           Maintainer: Newbyte
-          Depends: mutter-mobile, gnome-settings-daemon-mobile, pipewire-pulse | pulseaudio
+          Depends: mutter, gnome-settings-daemon, pipewire-pulse | pulseaudio
           Description: GNOME Shell Mobile (systemd)
           EOF
 

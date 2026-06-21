@@ -159,7 +159,7 @@ jobs:
           Version: ${PKGVER}-${PKGREL}
           Architecture: arm64
           Maintainer: Newbyte
-          Depends: gnome-settings-daemon-mobile
+          Depends: gnome-settings-daemon
           Description: Mutter Mobile (Debian Trixie build)
           EOF
 
