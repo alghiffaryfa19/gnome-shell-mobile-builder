@@ -46,11 +46,6 @@ jobs:
             ninja-build \
             pkg-config git gh
 
-          apt-get build-dep -y \
-            gnome-shell \
-            mutter \
-            gnome-settings-daemon
-
       # 🔥 Download MUTTER
       - name: "📥 Download MUTTER"
         id: download_mutter
