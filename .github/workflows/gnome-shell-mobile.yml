@@ -36,8 +36,20 @@ jobs:
       # 🔹 Build dependencies (Trixie)
       - name: Install dependencies
         run: |
-          apt install -y build-essential meson ninja-build pkg-config
-          apt build-dep gnome-shell mutter gnome-settings-daemon
+          sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+
+          sudo apt-get update
+
+          sudo apt-get install -y \
+            build-essential \
+            meson \
+            ninja-build \
+            pkg-config
+
+          sudo apt-get build-dep -y \
+            gnome-shell \
+            mutter \
+            gnome-settings-daemon
 
       # 🔥 Download MUTTER
       - name: "📥 Download MUTTER"

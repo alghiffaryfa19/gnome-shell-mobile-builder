@@ -49,10 +49,10 @@ jobs:
           git submodule update --init --recursive
 
       # ✅ EXTRACT AMAN
-      - name: Extract
-        run: |
-          tar -xzf gsd.tar.gz
-          ls -lah
+      # - name: Extract
+      #   run: |
+      #     tar -xzf gsd.tar.gz
+      #     ls -lah
 
 
       # ✅ BUILD (SYSTEMD)
