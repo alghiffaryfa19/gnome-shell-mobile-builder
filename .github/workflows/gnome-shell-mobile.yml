@@ -107,25 +107,35 @@ jobs:
           pkg-config --modversion mutter-clutter-16
 
       # 🔥 Download source
-      - name: Download source
+      # - name: Download source
+      #   run: |
+      #     wget -O gnome-shell-mobile.tar.gz \
+      #       https://gitlab.gnome.org/verdre/gnome-shell-mobile/-/archive/${COMMIT}/gnome-shell-mobile-${COMMIT}.tar.gz
+
+      #     wget -O gvc.tar.gz \
+      #       https://gitlab.gnome.org/GNOME/libgnome-volume-control/-/archive/${GVC_COMMIT}/libgnome-volume-control-${GVC_COMMIT}.tar.gz
+
+      #     tar -xzf gnome-shell-mobile.tar.gz
+
+      #     mkdir gvc
+      #     tar -xzf gvc.tar.gz -C gvc --strip-components=1
+
+      - name: Clone source
         run: |
-          wget -O gnome-shell-mobile.tar.gz \
-            https://gitlab.gnome.org/verdre/gnome-shell-mobile/-/archive/${COMMIT}/gnome-shell-mobile-${COMMIT}.tar.gz
+          git clone --recursive \
+            https://gitlab.gnome.org/verdre/gnome-shell-mobile.git -b gnome-48-mobile \
+            gnome-shell-mobile-${COMMIT}
 
-          wget -O gvc.tar.gz \
-            https://gitlab.gnome.org/GNOME/libgnome-volume-control/-/archive/${GVC_COMMIT}/libgnome-volume-control-${GVC_COMMIT}.tar.gz
-
-          tar -xzf gnome-shell-mobile.tar.gz
-
-          mkdir gvc
-          tar -xzf gvc.tar.gz -C gvc --strip-components=1
+          cd gnome-shell-mobile-${COMMIT}
+          git checkout ${COMMIT}
+          git submodule update --init --recursive
 
       # 🔧 Prepare
-      - name: Prepare
-        run: |
-          cd gnome-shell-mobile-${COMMIT}
-          mkdir -p subprojects/gvc
-          cp -r ../gvc/* subprojects/gvc/
+      # - name: Prepare
+      #   run: |
+      #     cd gnome-shell-mobile-${COMMIT}
+      #     mkdir -p subprojects/gvc
+      #     cp -r ../gvc/* subprojects/gvc/
 
       # 🚀 Build
       - name: Build

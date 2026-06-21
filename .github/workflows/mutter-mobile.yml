@@ -74,27 +74,37 @@ jobs:
           dpkg -i *.deb || apt -f install -y
 
       # ✅ Download source (explicit)
-      - name: Download source
-        run: |
-          wget -O mutter.tar.gz \
-            https://gitlab.gnome.org/verdre/mutter-mobile/-/archive/${COMMIT}/mutter-mobile-${COMMIT}.tar.gz
+      # - name: Download source
+      #   run: |
+      #     wget -O mutter.tar.gz \
+      #       https://gitlab.gnome.org/verdre/mutter-mobile/-/archive/${COMMIT}/mutter-mobile-${COMMIT}.tar.gz
 
-          wget -O gvdb.tar.gz \
-            https://gitlab.gnome.org/GNOME/gvdb/-/archive/${GVDB_COMMIT}/gvdb-${GVDB_COMMIT}.tar.gz
+      #     wget -O gvdb.tar.gz \
+      #       https://gitlab.gnome.org/GNOME/gvdb/-/archive/${GVDB_COMMIT}/gvdb-${GVDB_COMMIT}.tar.gz
+
+      - name: Clone source
+        run: |
+          git clone --recursive \
+            https://gitlab.gnome.org/verdre/mutter-mobile.git -b gnome-48-mobile \
+            mutter-mobile-${COMMIT}
+
+          cd mutter-mobile-${COMMIT}
+          git checkout ${COMMIT}
+          git submodule update --init --recursive
 
       # ✅ Extract aman
-      - name: Extract
-        run: |
-          tar -xzf mutter.tar.gz
-          mkdir gvdb
-          tar -xzf gvdb.tar.gz -C gvdb --strip-components=1
+      # - name: Extract
+      #   run: |
+      #     tar -xzf mutter.tar.gz
+      #     mkdir gvdb
+      #     tar -xzf gvdb.tar.gz -C gvdb --strip-components=1
 
       # ✅ Prepare
-      - name: Prepare
-        run: |
-          cd mutter-mobile-${COMMIT}
-          mkdir -p subprojects/gvdb
-          cp -r ../gvdb/* subprojects/gvdb/
+      # - name: Prepare
+      #   run: |
+      #     cd mutter-mobile-${COMMIT}
+      #     mkdir -p subprojects/gvdb
+      #     cp -r ../gvdb/* subprojects/gvdb/
 
       # ✅ Build
       - name: Build
