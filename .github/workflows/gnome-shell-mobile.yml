@@ -198,7 +198,7 @@ jobs:
           cp -r gnome-shell-mobile-${COMMIT}/pkg/usr/* deb/usr/
 
           cat <<EOF > deb/DEBIAN/control
-          Package: gnome-shell-mobile
+          Package: gnome-shell
           Version: ${PKGVER}-${PKGREL}
           Architecture: arm64
           Maintainer: Newbyte

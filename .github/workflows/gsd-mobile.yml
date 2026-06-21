@@ -80,7 +80,7 @@ jobs:
           cp -r gnome-settings-daemon-mobile-${COMMIT}/pkg/usr/* deb/usr/
 
           cat <<EOF > deb/DEBIAN/control
-          Package: gnome-settings-daemon-mobile
+          Package: gnome-settings-daemon
           Version: ${PKGVER}-${PKGREL}
           Architecture: arm64
           Maintainer: Newbyte <newbyte@postmarketos.org>

@@ -152,7 +152,7 @@ jobs:
           cp -r mutter-mobile-${COMMIT}/pkg/* deb/
 
           cat <<EOF > deb/DEBIAN/control
-          Package: mutter-mobile
+          Package: mutter
           Version: ${PKGVER}-${PKGREL}
           Architecture: arm64
           Maintainer: Newbyte
