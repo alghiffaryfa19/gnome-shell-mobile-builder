@@ -37,6 +37,14 @@ jobs:
             mutter \
             gnome-settings-daemon
 
+      - name: Build and install libnotify
+        run: |
+          git clone https://gitlab.gnome.org/GNOME/libnotify.git -b 0.8.8
+          cd libnotify
+          meson setup build --prefix=/usr -Dtests=false -Dman=false -Dgtk_doc=false
+          meson compile -C build
+          sudo meson install -C build
+
       # ✅ DOWNLOAD (EXPLICIT, NO WILDCARD)
       - name: Clone source
         run: |
