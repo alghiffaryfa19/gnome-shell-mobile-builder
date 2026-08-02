@@ -170,14 +170,14 @@ jobs:
           echo "Verify pkg-config after override:"
           pkg-config --path gnome-settings-daemon
           pkg-config --modversion gnome-settings-daemon
-          pkg-config --modversion libmutter-16
-          pkg-config --modversion mutter-clutter-16
-          pkg-config --modversion mutter-mtk-16
-          pkg-config --modversion mutter-cogl-16
+          pkg-config --modversion libmutter-51
+          pkg-config --modversion mutter-clutter-51
+          pkg-config --modversion mutter-mtk-51
+          pkg-config --modversion mutter-cogl-51
           pkg-config --variable=systemduserunitdir systemd
 
           test "$(pkg-config --modversion gnome-settings-daemon)" = "51.0"
-          test "$(pkg-config --modversion libmutter-16)" = "51.0"
+          test "$(pkg-config --modversion libmutter-51)" = "51.0"
 
       - name: Clone GNOME Shell Mobile source
         run: |
