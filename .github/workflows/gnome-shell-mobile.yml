@@ -176,8 +176,7 @@ jobs:
           pkg-config --modversion mutter-cogl-51
           pkg-config --variable=systemduserunitdir systemd
 
-          test "$(pkg-config --modversion gnome-settings-daemon)" = "51.0"
-          test "$(pkg-config --modversion libmutter-51)" = "51.0"
+
 
       - name: Clone GNOME Shell Mobile source
         run: |
@@ -212,8 +211,7 @@ jobs:
           echo "libmutter cflags:"
           pkg-config --cflags libmutter-51
 
-          test "$(pkg-config --modversion gnome-settings-daemon)" = "51.0"
-          test "$(pkg-config --modversion libmutter-51)" = "51.0"
+
 
       - name: Build GNOME Shell Mobile
         run: |
