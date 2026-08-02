@@ -65,7 +65,6 @@ jobs:
           # 使用GitHub CLI下载Release文件
           gh release download "gsd-${{ matrix.os }}" \
             --pattern "*gsd*.deb" \
-            --pattern "*libnotify*.deb" \
             --repo "${{ github.repository }}" \
             --clobber
 

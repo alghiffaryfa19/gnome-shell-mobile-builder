@@ -48,36 +48,7 @@ jobs:
             mutter \
             gnome-settings-daemon
 
-      - name: Build, install, and package libnotify
-        run: |
-          git clone https://gitlab.gnome.org/GNOME/libnotify.git -b 0.8.8
-          cd libnotify
-          meson setup build --prefix=/usr -Dtests=false -Dman=false -Dgtk_doc=false
-          meson compile -C build
-          
-          # Install to a local dir for deb packaging
-          DESTDIR=$(pwd)/pkg meson install -C build
-          
-          # Install to system so GSD can build against it
-          meson install -C build
-          
-          # Create DEB package
-          cd ..
-          mkdir -p deb-libnotify/DEBIAN deb-libnotify/usr
-          cp -r libnotify/pkg/usr/* deb-libnotify/usr/
-          
-          cat <<EOF > deb-libnotify/DEBIAN/control
-          Package: libnotify4
-          Version: 0.8.8-1
-          Architecture: arm64
-          Maintainer: Newbyte <newbyte@postmarketos.org>
-          Provides: libnotify-dev, libnotify-bin, gir1.2-notify-0.7
-          Replaces: libnotify-dev, libnotify-bin, gir1.2-notify-0.7
-          Conflicts: libnotify-dev, libnotify-bin, gir1.2-notify-0.7
-          Description: sends desktop notifications to a notification daemon (0.8.8 backport)
-          EOF
-          
-          dpkg-deb --build deb-libnotify libnotify4-0.8.8-arm64.deb
+
 
       # ✅ DOWNLOAD (EXPLICIT, NO WILDCARD)
       - name: Clone source
