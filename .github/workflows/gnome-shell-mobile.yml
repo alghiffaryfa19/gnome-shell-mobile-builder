@@ -19,10 +19,10 @@ jobs:
 
     env:
       # Pakai versi lebih tinggi dari paket Debian agar tidak dianggap downgrade saat nanti diinstall
-      PKGVER: 48.4+mobile.0
-      PKGREL: 6
-      COMMIT: 48.mobile.0
-      GVC_COMMIT: 47c47a423ff2f55bb038d92517e4782cf051496a
+      PKGVER: 51.0
+      PKGREL: 7
+      COMMIT: mobile
+      GVC_COMMIT: 48c170f7ec6f58dbb1b566dbd873d6af49b3c2ca
 
     steps:
       - name: Install base tools
@@ -136,7 +136,7 @@ jobs:
           cat "$GSD_PC"
 
           cp "$GSD_PC" /tmp/mobile-pkgconfig/gnome-settings-daemon.pc
-          sed -i 's/^Version:.*/Version: 48.mobile.0/' /tmp/mobile-pkgconfig/gnome-settings-daemon.pc
+          sed -i 's/^Version:.*/Version: 51.0/' /tmp/mobile-pkgconfig/gnome-settings-daemon.pc
 
           echo "Create systemd.pc override"
           cat > /tmp/mobile-pkgconfig/systemd.pc <<'EOF'
@@ -168,14 +168,14 @@ jobs:
           pkg-config --modversion mutter-cogl-16
           pkg-config --variable=systemduserunitdir systemd
 
-          test "$(pkg-config --modversion gnome-settings-daemon)" = "48.mobile.0"
-          test "$(pkg-config --modversion libmutter-16)" = "48.mobile.0"
+          test "$(pkg-config --modversion gnome-settings-daemon)" = "51.0"
+          test "$(pkg-config --modversion libmutter-16)" = "51.0"
 
       - name: Clone GNOME Shell Mobile source
         run: |
           git clone --recursive \
-            https://gitlab.gnome.org/verdre/gnome-shell-mobile.git \
-            -b gnome-48-mobile \
+            https://gitlab.gnome.org/World/MobileShell/gnome-shell-mobile.git \
+            -b mobile \
             gnome-shell-mobile-${COMMIT}
 
           cd gnome-shell-mobile-${COMMIT}
@@ -204,8 +204,8 @@ jobs:
           echo "libmutter cflags:"
           pkg-config --cflags libmutter-16
 
-          test "$(pkg-config --modversion gnome-settings-daemon)" = "48.mobile.0"
-          test "$(pkg-config --modversion libmutter-16)" = "48.mobile.0"
+          test "$(pkg-config --modversion gnome-settings-daemon)" = "51.0"
+          test "$(pkg-config --modversion libmutter-16)" = "51.0"
 
       - name: Build GNOME Shell Mobile
         run: |

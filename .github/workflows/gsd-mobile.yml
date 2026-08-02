@@ -8,16 +8,16 @@ on:
 
 permissions:
   contents: write
-  
+
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
 
     env:
-      PKGVER: 48.0
-      PKGREL: 4
-      COMMIT: 48.mobile.0
-      GVC_COMMIT: 47c47a423ff2f55bb038d92517e4782cf051496a
+      PKGVER: 51.0
+      PKGREL: 5
+      COMMIT: mobile
+      GVC_COMMIT: 50dbd7f381524ce7700f2aed64c144d3c45c87f9
 
     steps:
       - name: Install dependencies
@@ -41,7 +41,7 @@ jobs:
       - name: Clone source
         run: |
           git clone --recursive \
-            https://gitlab.gnome.org/verdre/gnome-settings-daemon-mobile.git -b gnome-48-mobile \
+            https://gitlab.gnome.org/World/MobileShell/gnome-settings-daemon-mobile.git -b mobile \
             gnome-settings-daemon-mobile-${COMMIT}
 
           cd gnome-settings-daemon-mobile-${COMMIT}
@@ -53,7 +53,6 @@ jobs:
       #   run: |
       #     tar -xzf gsd.tar.gz
       #     ls -lah
-
 
       # ✅ BUILD (SYSTEMD)
       - name: Build

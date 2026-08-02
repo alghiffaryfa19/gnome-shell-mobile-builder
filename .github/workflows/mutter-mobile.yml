@@ -11,7 +11,7 @@ on:
 
 permissions:
   contents: write
-  
+
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
@@ -20,10 +20,10 @@ jobs:
       image: debian:trixie
 
     env:
-      PKGVER: 48.0
-      PKGREL: 2
-      COMMIT: 48.mobile.0
-      GVDB_COMMIT: b54bc5da25127ef416858a3ad92e57159ff565b3
+      PKGVER: 51.0
+      PKGREL: 3
+      COMMIT: mobile
+      GVDB_COMMIT: 652c6b8bba3d6b3e909449c38b35281d046a752b
 
     steps:
       - name: Install dependencies
@@ -51,20 +51,20 @@ jobs:
       - name: "📥 Download GSD"
         id: download_gsd
         run: |
-          
+
           # 使用GitHub CLI下载Release文件
           gh release download "gsd" \
             --pattern "*gsd*.deb" \
             --repo "${{ github.repository }}" \
             --clobber
-          
+
           # 验证下载的文件
           DEB_COUNT=$(ls -1 *.deb 2>/dev/null | wc -l)
           if [ $DEB_COUNT -eq 0 ]; then
             echo "❌ 错误：未下载到任何内核包！"
             exit 1
           fi
-          
+
           echo "✅ 成功下载 $DEB_COUNT 个内核包"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -88,7 +88,7 @@ jobs:
       - name: Clone source
         run: |
           git clone --recursive \
-            https://gitlab.gnome.org/verdre/mutter-mobile.git -b gnome-48-mobile \
+            https://gitlab.gnome.org/World/MobileShell/mutter-mobile.git -b mobile \
             mutter-mobile-${COMMIT}
 
           cd mutter-mobile-${COMMIT}
