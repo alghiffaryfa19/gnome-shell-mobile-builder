@@ -133,8 +133,6 @@ jobs:
 
           meson setup build \
             --prefix=/usr \
-            -Dudev=true \
-            -Dnative_backend=true \
             -Dintrospection=true \
             -Dxwayland_path=/usr/bin/Xwayland \
             -Dremote_desktop=true \
