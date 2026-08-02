@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, debian]
-    
+
     container:
       image: ${{ matrix.os == 'ubuntu' && 'ubuntu:26.04' || 'debian:forky' }}
 
@@ -52,21 +52,21 @@ jobs:
         run: |
           git clone https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas.git
           cd gsettings-desktop-schemas
-          
+
           # Just use master for >= 51.alpha
           meson setup build --prefix=/usr
           meson compile -C build
-          
+
           # Install locally for packaging
           DESTDIR=$(pwd)/pkg meson install -C build
-          
+
           # Install to system for GSD
           meson install -C build
-          
+
           cd ..
           mkdir -p deb-gsds/DEBIAN deb-gsds/usr
           cp -r gsettings-desktop-schemas/pkg/usr/* deb-gsds/usr/
-          
+
           cat <<EOF > deb-gsds/DEBIAN/control
           Package: gsettings-desktop-schemas
           Version: 52.0-1
@@ -76,8 +76,36 @@ jobs:
           Replaces: gsettings-desktop-schemas-dev, gsettings-desktop-schemas
           Description: GSettings desktop-wide schemas (latest backport)
           EOF
-          
+
           dpkg-deb --build deb-gsds gsettings-desktop-schemas_52.0-all.deb
+
+      - name: Build and package wayland-protocols
+        run: |
+          git clone https://gitlab.freedesktop.org/wayland/wayland-protocols.git
+          cd wayland-protocols
+
+          meson setup build --prefix=/usr
+          meson compile -C build
+
+          # Install locally for packaging
+          DESTDIR=$(pwd)/pkg meson install -C build
+
+          # Install to system for GSD
+          meson install -C build
+
+          cd ..
+          mkdir -p deb-wayland/DEBIAN deb-wayland/usr
+          cp -r wayland-protocols/pkg/usr/* deb-wayland/usr/
+
+          cat <<EOF > deb-wayland/DEBIAN/control
+          Package: wayland-protocols
+          Version: 1.49
+          Architecture: all
+          Maintainer: Builder <builder@postmarketos.org>
+          Description: Wayland protocols (latest backport)
+          EOF
+
+          dpkg-deb --build deb-wayland wayland-protocols_1.49-all.deb
 
       # ✅ DOWNLOAD (EXPLICIT, NO WILDCARD)
       - name: Clone source
