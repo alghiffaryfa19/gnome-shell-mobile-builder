@@ -199,10 +199,10 @@ jobs:
           pkg-config --modversion gnome-settings-daemon
 
           echo "Mutter:"
-          pkg-config --modversion libmutter-16
-          pkg-config --modversion mutter-clutter-16
-          pkg-config --modversion mutter-mtk-16
-          pkg-config --modversion mutter-cogl-16
+          pkg-config --modversion libmutter-51
+          pkg-config --modversion mutter-clutter-51
+          pkg-config --modversion mutter-mtk-51
+          pkg-config --modversion mutter-cogl-51
 
           echo "Systemd:"
           pkg-config --modversion systemd
@@ -210,10 +210,10 @@ jobs:
           pkg-config --variable=systemdsystemunitdir systemd
 
           echo "libmutter cflags:"
-          pkg-config --cflags libmutter-16
+          pkg-config --cflags libmutter-51
 
           test "$(pkg-config --modversion gnome-settings-daemon)" = "51.0"
-          test "$(pkg-config --modversion libmutter-16)" = "51.0"
+          test "$(pkg-config --modversion libmutter-51)" = "51.0"
 
       - name: Build GNOME Shell Mobile
         run: |
