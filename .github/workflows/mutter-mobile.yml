@@ -46,7 +46,8 @@ jobs:
             ninja-build \
             pkg-config git \
             libglycin-2-dev \
-            cmake
+            cmake \
+            wget
 
           apt-get build-dep -y \
             gnome-shell \
