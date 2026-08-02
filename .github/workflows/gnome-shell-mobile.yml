@@ -13,9 +13,13 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, debian]
 
     container:
-      image: debian:trixie
+      image: ${{ matrix.os == 'ubuntu' && 'ubuntu:26.04' || 'debian:trixie' }}
 
     env:
       # Pakai versi lebih tinggi dari paket Debian agar tidak dianggap downgrade saat nanti diinstall
@@ -39,8 +43,12 @@ jobs:
 
       - name: Install build dependencies
         run: |
-          if [ -f /etc/apt/sources.list.d/debian.sources ]; then
-            sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
+          if [ "${{ matrix.os }}" = "ubuntu" ]; then
+            sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+          else
+            if [ -f /etc/apt/sources.list.d/debian.sources ]; then
+              sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
+            fi
           fi
 
           apt-get update
@@ -63,7 +71,7 @@ jobs:
         run: |
           mkdir -p deps/mutter
 
-          gh release download "mutter" \
+          gh release download "mutter-${{ matrix.os }}" \
             --pattern "*mutter*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/mutter \
@@ -85,7 +93,7 @@ jobs:
         run: |
           mkdir -p deps/gsd
 
-          gh release download "gsd" \
+          gh release download "gsd-${{ matrix.os }}" \
             --pattern "*gsd*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/gsd \
@@ -257,7 +265,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gnome-shell
+          name: gnome-shell-${{ matrix.os }}
           path: "*.deb"
           retention-days: 7
           if-no-files-found: error
@@ -265,8 +273,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: gnome-shell-${{ github.run_number }}
-          name: GNOME Shell Mobile
+          tag_name: gnome-shell-${{ matrix.os }}-${{ github.run_number }}
+          name: GNOME Shell Mobile (${{ matrix.os }})
           body: |
             GNOME Shell Mobile build.
           draft: false
