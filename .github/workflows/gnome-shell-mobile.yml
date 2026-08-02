@@ -55,7 +55,8 @@ jobs:
             pkg-config \
             cmake \
             git \
-            libglycin-2-dev
+            libglycin-2-dev \
+            librsvg2-dev
 
           apt-get build-dep -y \
             gnome-shell \
