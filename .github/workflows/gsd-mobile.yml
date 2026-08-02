@@ -15,10 +15,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu, debian]
+        os: [debian]
 
     container:
-      image: ${{ matrix.os == 'ubuntu' && 'ubuntu:26.04' || 'debian:forky' }}
+      image: debian:forky
 
     env:
       PKGVER: 51.0
@@ -29,11 +29,7 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-          if [ "${{ matrix.os }}" = "ubuntu" ]; then
-            sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
-          else
-            sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
-          fi
+          sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
 
           apt-get update
 
@@ -78,34 +74,6 @@ jobs:
           EOF
 
           dpkg-deb --build deb-gsds gsettings-desktop-schemas_52.0-all.deb
-
-      - name: Build and package wayland-protocols
-        run: |
-          git clone https://gitlab.freedesktop.org/wayland/wayland-protocols.git
-          cd wayland-protocols
-
-          meson setup build --prefix=/usr
-          meson compile -C build
-
-          # Install locally for packaging
-          DESTDIR=$(pwd)/pkg meson install -C build
-
-          # Install to system for GSD
-          meson install -C build
-
-          cd ..
-          mkdir -p deb-wayland/DEBIAN deb-wayland/usr
-          cp -r wayland-protocols/pkg/usr/* deb-wayland/usr/
-
-          cat <<EOF > deb-wayland/DEBIAN/control
-          Package: wayland-protocols
-          Version: 1.49
-          Architecture: all
-          Maintainer: Builder <builder@postmarketos.org>
-          Description: Wayland protocols (latest backport)
-          EOF
-
-          dpkg-deb --build deb-wayland wayland-protocols_1.49-all.deb
 
       # ✅ DOWNLOAD (EXPLICIT, NO WILDCARD)
       - name: Clone source

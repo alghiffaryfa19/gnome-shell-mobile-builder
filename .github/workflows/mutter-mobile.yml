@@ -18,10 +18,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu, debian]
-
+        os: [debian]
+        
     container:
-      image: ${{ matrix.os == 'ubuntu' && 'ubuntu:26.04' || 'debian:forky' }}
+      image: debian:forky
 
     env:
       PKGVER: 51.0
@@ -32,11 +32,7 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-          if [ "${{ matrix.os }}" = "ubuntu" ]; then
-            sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
-          else
-            sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
-          fi
+          sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
 
           apt-get update
 
