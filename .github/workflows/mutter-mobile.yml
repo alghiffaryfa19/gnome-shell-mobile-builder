@@ -44,7 +44,9 @@ jobs:
             build-essential \
             meson \
             ninja-build \
-            pkg-config git gh
+            pkg-config git gh \
+            libglycin-2-dev \
+            cmake
 
           apt-get build-dep -y \
             gnome-shell \

@@ -60,7 +60,8 @@ jobs:
             pkg-config \
             cmake \
             git \
-            gh
+            gh \
+            libglycin-2-dev
 
           apt-get build-dep -y \
             gnome-shell \
