@@ -18,7 +18,7 @@ jobs:
         os: [ubuntu, debian]
     
     container:
-      image: ${{ matrix.os == 'ubuntu' && 'ubuntu:26.04' || 'debian:trixie' }}
+      image: ${{ matrix.os == 'ubuntu' && 'ubuntu:26.04' || 'debian:forky' }}
 
     env:
       PKGVER: 51.0

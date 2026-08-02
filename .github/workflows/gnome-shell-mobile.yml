@@ -19,7 +19,7 @@ jobs:
         os: [ubuntu, debian]
 
     container:
-      image: ${{ matrix.os == 'ubuntu' && 'ubuntu:26.04' || 'debian:trixie' }}
+      image: ${{ matrix.os == 'ubuntu' && 'ubuntu:26.04' || 'debian:forky' }}
 
     env:
       # Pakai versi lebih tinggi dari paket Debian agar tidak dianggap downgrade saat nanti diinstall
@@ -258,7 +258,7 @@ jobs:
           Replaces: gnome-shell
           Conflicts: gnome-shell
           Description: GNOME Shell Mobile
-           GNOME Shell Mobile build for Debian Trixie.
+           GNOME Shell Mobile build for Debian Forky / Ubuntu 26.04.
           EOF
 
           dpkg-deb --build deb gnome-shell-mobile.deb
