@@ -31,15 +31,15 @@ jobs:
         run: |
           sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
 
-          sudo apt-get update
+          apt-get update
 
-          sudo apt-get install -y \
+          apt-get install -y \
             build-essential \
             meson \
             ninja-build \
             pkg-config
 
-          sudo apt-get build-dep -y \
+          apt-get build-dep -y \
             gnome-shell \
             mutter \
             gnome-settings-daemon
