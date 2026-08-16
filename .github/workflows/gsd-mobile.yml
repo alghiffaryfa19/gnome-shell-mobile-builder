@@ -12,6 +12,13 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [debian]
+        
+    container:
+      image: debian:forky
 
     env:
       PKGVER: 51~beta
@@ -22,7 +29,7 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-          sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+          sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
 
           sudo apt-get update
 
