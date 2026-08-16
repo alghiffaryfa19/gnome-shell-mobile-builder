@@ -13,20 +13,16 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [debian]
-        
+
     container:
-      image: debian:forky
+      image: debian:trixie
 
     env:
       # Pakai versi lebih tinggi dari paket Debian agar tidak dianggap downgrade saat nanti diinstall
-      PKGVER: 51.0
-      PKGREL: 7
-      COMMIT: mobile
-      GVC_COMMIT: 48c170f7ec6f58dbb1b566dbd873d6af49b3c2ca
+      PKGVER: 50.3
+      PKGREL: 1
+      COMMIT: 50.3
+      GVC_COMMIT: 47c47a423ff2f55bb038d92517e4782cf051496a
 
     steps:
       - name: Install base tools
@@ -38,7 +34,8 @@ jobs:
             wget \
             curl \
             ca-certificates \
-            gnupg
+            gnupg \
+            gh
 
       - name: Install build dependencies
         run: |
@@ -55,24 +52,18 @@ jobs:
             pkg-config \
             cmake \
             git \
-            libglycin-2-dev \
-            librsvg2-dev
+            gh
 
           apt-get build-dep -y \
             gnome-shell \
             mutter \
             gnome-settings-daemon
 
-          # Install GitHub CLI (gh) manually since it is not in Debian Forky
-          wget https://github.com/cli/cli/releases/download/v2.54.0/gh_2.54.0_linux_arm64.tar.gz
-          tar xzf gh_*_linux_arm64.tar.gz
-          cp gh_*_linux_arm64/bin/gh /usr/local/bin/
-
       - name: Download Mutter Mobile deb
         run: |
           mkdir -p deps/mutter
 
-          gh release download "mutter-${{ matrix.os }}" \
+          gh release download "mutter-50.3" \
             --pattern "*mutter*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/mutter \
@@ -94,8 +85,8 @@ jobs:
         run: |
           mkdir -p deps/gsd
 
-          gh release download "gsd-${{ matrix.os }}" \
-            --pattern "*.deb" \
+          gh release download "gsd-51~beta" \
+            --pattern "*gsd*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/gsd \
             --clobber
@@ -145,7 +136,7 @@ jobs:
           cat "$GSD_PC"
 
           cp "$GSD_PC" /tmp/mobile-pkgconfig/gnome-settings-daemon.pc
-          sed -i 's/^Version:.*/Version: 51.0/' /tmp/mobile-pkgconfig/gnome-settings-daemon.pc
+          sed -i 's/^Version:.*/Version: 50.3/' /tmp/mobile-pkgconfig/gnome-settings-daemon.pc
 
           echo "Create systemd.pc override"
           cat > /tmp/mobile-pkgconfig/systemd.pc <<'EOF'
@@ -171,19 +162,19 @@ jobs:
           echo "Verify pkg-config after override:"
           pkg-config --path gnome-settings-daemon
           pkg-config --modversion gnome-settings-daemon
-          pkg-config --modversion libmutter-51
-          pkg-config --modversion mutter-clutter-51
-          pkg-config --modversion mutter-mtk-51
-          pkg-config --modversion mutter-cogl-51
+          pkg-config --modversion libmutter-16
+          pkg-config --modversion mutter-clutter-16
+          pkg-config --modversion mutter-mtk-16
+          pkg-config --modversion mutter-cogl-16
           pkg-config --variable=systemduserunitdir systemd
 
-
+          
 
       - name: Clone GNOME Shell Mobile source
         run: |
           git clone --recursive \
             https://gitlab.gnome.org/World/MobileShell/gnome-shell-mobile.git \
-            -b mobile \
+            -b mobile-shell-devel-50 \
             gnome-shell-mobile-${COMMIT}
 
           cd gnome-shell-mobile-${COMMIT}
@@ -199,10 +190,10 @@ jobs:
           pkg-config --modversion gnome-settings-daemon
 
           echo "Mutter:"
-          pkg-config --modversion libmutter-51
-          pkg-config --modversion mutter-clutter-51
-          pkg-config --modversion mutter-mtk-51
-          pkg-config --modversion mutter-cogl-51
+          pkg-config --modversion libmutter-16
+          pkg-config --modversion mutter-clutter-16
+          pkg-config --modversion mutter-mtk-16
+          pkg-config --modversion mutter-cogl-16
 
           echo "Systemd:"
           pkg-config --modversion systemd
@@ -210,9 +201,9 @@ jobs:
           pkg-config --variable=systemdsystemunitdir systemd
 
           echo "libmutter cflags:"
-          pkg-config --cflags libmutter-51
+          pkg-config --cflags libmutter-16
 
-
+          
 
       - name: Build GNOME Shell Mobile
         run: |
@@ -256,7 +247,7 @@ jobs:
           Replaces: gnome-shell
           Conflicts: gnome-shell
           Description: GNOME Shell Mobile
-           GNOME Shell Mobile build for Debian Forky / Ubuntu 26.04.
+           GNOME Shell Mobile build for Debian Trixie.
           EOF
 
           dpkg-deb --build deb gnome-shell-mobile.deb
@@ -264,7 +255,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gnome-shell-${{ matrix.os }}
+          name: gnome-shell
           path: "*.deb"
           retention-days: 7
           if-no-files-found: error
@@ -272,8 +263,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: gnome-shell-${{ matrix.os }}-${{ github.run_number }}
-          name: GNOME Shell Mobile (${{ matrix.os }})
+          tag_name: gnome-shell-${{ github.run_number }}
+          name: GNOME Shell Mobile
           body: |
             GNOME Shell Mobile build.
           draft: false

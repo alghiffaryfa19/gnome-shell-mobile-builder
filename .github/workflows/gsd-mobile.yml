@@ -8,78 +8,40 @@ on:
 
 permissions:
   contents: write
-
+  
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [debian]
-
-    container:
-      image: debian:forky
 
     env:
-      PKGVER: 51.0
-      PKGREL: 5
-      COMMIT: mobile
-      GVC_COMMIT: 50dbd7f381524ce7700f2aed64c144d3c45c87f9
+      PKGVER: 51~beta
+      PKGREL: 1
+      COMMIT: 51.beta
+      GVC_COMMIT: 0a4eda0cdc2deb352bebc70ec697c42af46094e4
 
     steps:
       - name: Install dependencies
         run: |
-          sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
+          sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
 
-          apt-get update
+          sudo apt-get update
 
-          apt-get install -y \
+          sudo apt-get install -y \
             build-essential \
             meson \
             ninja-build \
-            pkg-config git
+            pkg-config
 
-          apt-get build-dep -y \
+          sudo apt-get build-dep -y \
             gnome-shell \
             mutter \
             gnome-settings-daemon
-
-      - name: Build and package gsettings-desktop-schemas
-        run: |
-          git clone https://gitlab.gnome.org/GNOME/gsettings-desktop-schemas.git
-          cd gsettings-desktop-schemas
-
-          # Just use master for >= 51.alpha
-          meson setup build --prefix=/usr
-          meson compile -C build
-
-          # Install locally for packaging
-          DESTDIR=$(pwd)/pkg meson install -C build
-
-          # Install to system for GSD
-          meson install -C build
-
-          cd ..
-          mkdir -p deb-gsds/DEBIAN deb-gsds/usr
-          cp -r gsettings-desktop-schemas/pkg/usr/* deb-gsds/usr/
-
-          cat <<EOF > deb-gsds/DEBIAN/control
-          Package: gsettings-desktop-schemas
-          Version: 52.0-1
-          Architecture: all
-          Maintainer: Builder <builder@postmarketos.org>
-          Provides: gsettings-desktop-schemas-dev
-          Replaces: gsettings-desktop-schemas-dev, gsettings-desktop-schemas
-          Description: GSettings desktop-wide schemas (latest backport)
-          EOF
-
-          dpkg-deb --build deb-gsds gsettings-desktop-schemas_52.0-all.deb
 
       # ✅ DOWNLOAD (EXPLICIT, NO WILDCARD)
       - name: Clone source
         run: |
           git clone --recursive \
-            https://gitlab.gnome.org/World/MobileShell/gnome-settings-daemon-mobile.git -b mobile \
+            https://gitlab.gnome.org/World/MobileShell/gnome-settings-daemon-mobile.git -b main \
             gnome-settings-daemon-mobile-${COMMIT}
 
           cd gnome-settings-daemon-mobile-${COMMIT}
@@ -91,6 +53,7 @@ jobs:
       #   run: |
       #     tar -xzf gsd.tar.gz
       #     ls -lah
+
 
       # ✅ BUILD (SYSTEMD)
       - name: Build
@@ -130,7 +93,7 @@ jobs:
       - name: "📤 上传构建产物"
         uses: actions/upload-artifact@v4
         with:
-          name: gsd-${{ matrix.os }}
+          name: gsd
           path: "*.deb"
           retention-days: 7
           if-no-files-found: error
@@ -138,8 +101,8 @@ jobs:
       - name: "🏷️ 创建GitHub Release"
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: gsd-${{ matrix.os }}
-          name: "GSD (${{ matrix.os }})"
+          tag_name: gsd-${PKGVER}
+          name: "GSD"
           body: |
             🧩 GSD
           draft: false
