@@ -45,7 +45,6 @@ jobs:
             gnome-settings-daemon-mobile-${COMMIT}
 
           cd gnome-settings-daemon-mobile-${COMMIT}
-          git checkout ${COMMIT}
           git submodule update --init --recursive
 
       # ✅ EXTRACT AMAN
