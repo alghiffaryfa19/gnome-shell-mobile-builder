@@ -72,7 +72,7 @@ jobs:
         run: |
           mkdir -p deps/mutter
 
-          gh release download "mutter-${{ matrix.os }}" \
+          gh release download "mutter-51" \
             --pattern "*mutter*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/mutter \
@@ -94,7 +94,7 @@ jobs:
         run: |
           mkdir -p deps/gsd
 
-          gh release download "gsd-${{ matrix.os }}" \
+          gh release download "gsd-50.3" \
             --pattern "*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/gsd \
@@ -271,7 +271,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: gnome-shell-${{ matrix.os }}-${{ github.run_number }}
+          tag_name: gnome-shell-50
           name: GNOME Shell Mobile (${{ matrix.os }})
           body: |
             GNOME Shell Mobile build.
