@@ -13,7 +13,11 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
-
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [debian]
+        
     container:
       image: debian:forky
 
@@ -21,8 +25,8 @@ jobs:
       # Pakai versi lebih tinggi dari paket Debian agar tidak dianggap downgrade saat nanti diinstall
       PKGVER: 50.3
       PKGREL: 1
-      COMMIT: 50.3
-      GVC_COMMIT: 47c47a423ff2f55bb038d92517e4782cf051496a
+      COMMIT: mobile-shell-devel
+      GVC_COMMIT: 0a4eda0cdc2deb352bebc70ec697c42af46094e4
 
     steps:
       - name: Install base tools
@@ -68,7 +72,7 @@ jobs:
         run: |
           mkdir -p deps/mutter
 
-          gh release download "mutter-51" \
+          gh release download "mutter-${{ matrix.os }}" \
             --pattern "*mutter*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/mutter \
@@ -90,8 +94,8 @@ jobs:
         run: |
           mkdir -p deps/gsd
 
-          gh release download "gsd-50.3" \
-            --pattern "*gsd*.deb" \
+          gh release download "gsd-${{ matrix.os }}" \
+            --pattern "*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/gsd \
             --clobber
@@ -141,7 +145,7 @@ jobs:
           cat "$GSD_PC"
 
           cp "$GSD_PC" /tmp/mobile-pkgconfig/gnome-settings-daemon.pc
-          sed -i 's/^Version:.*/Version: 50.3/' /tmp/mobile-pkgconfig/gnome-settings-daemon.pc
+          sed -i 's/^Version:.*/Version: 51.0/' /tmp/mobile-pkgconfig/gnome-settings-daemon.pc
 
           echo "Create systemd.pc override"
           cat > /tmp/mobile-pkgconfig/systemd.pc <<'EOF'
@@ -167,13 +171,13 @@ jobs:
           echo "Verify pkg-config after override:"
           pkg-config --path gnome-settings-daemon
           pkg-config --modversion gnome-settings-daemon
-          pkg-config --modversion libmutter-16
-          pkg-config --modversion mutter-clutter-16
-          pkg-config --modversion mutter-mtk-16
-          pkg-config --modversion mutter-cogl-16
+          pkg-config --modversion libmutter-51
+          pkg-config --modversion mutter-clutter-51
+          pkg-config --modversion mutter-mtk-51
+          pkg-config --modversion mutter-cogl-51
           pkg-config --variable=systemduserunitdir systemd
 
-          
+
 
       - name: Clone GNOME Shell Mobile source
         run: |
@@ -194,10 +198,10 @@ jobs:
           pkg-config --modversion gnome-settings-daemon
 
           echo "Mutter:"
-          pkg-config --modversion libmutter-16
-          pkg-config --modversion mutter-clutter-16
-          pkg-config --modversion mutter-mtk-16
-          pkg-config --modversion mutter-cogl-16
+          pkg-config --modversion libmutter-51
+          pkg-config --modversion mutter-clutter-51
+          pkg-config --modversion mutter-mtk-51
+          pkg-config --modversion mutter-cogl-51
 
           echo "Systemd:"
           pkg-config --modversion systemd
@@ -205,9 +209,9 @@ jobs:
           pkg-config --variable=systemdsystemunitdir systemd
 
           echo "libmutter cflags:"
-          pkg-config --cflags libmutter-16
+          pkg-config --cflags libmutter-51
 
-          
+
 
       - name: Build GNOME Shell Mobile
         run: |
@@ -251,7 +255,7 @@ jobs:
           Replaces: gnome-shell
           Conflicts: gnome-shell
           Description: GNOME Shell Mobile
-           GNOME Shell Mobile build for Debian Trixie.
+           GNOME Shell Mobile build for Debian Forky / Ubuntu 26.04.
           EOF
 
           dpkg-deb --build deb gnome-shell-mobile.deb
@@ -259,7 +263,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gnome-shell
+          name: gnome-shell-${{ matrix.os }}
           path: "*.deb"
           retention-days: 7
           if-no-files-found: error
@@ -267,8 +271,8 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: gnome-shell-${{ github.run_number }}
-          name: GNOME Shell Mobile
+          tag_name: gnome-shell-${{ matrix.os }}-${{ github.run_number }}
+          name: GNOME Shell Mobile (${{ matrix.os }})
           body: |
             GNOME Shell Mobile build.
           draft: false
