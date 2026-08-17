@@ -11,19 +11,23 @@ on:
 
 permissions:
   contents: write
-  
+
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
-
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [debian]
+        
     container:
       image: debian:forky
 
     env:
-      PKGVER: 50.3
-      PKGREL: 1
-      COMMIT: 50.3
-      GVDB_COMMIT: b54bc5da25127ef416858a3ad92e57159ff565b3
+      PKGVER: 51.0
+      PKGREL: 3
+      COMMIT: mobile
+      GVDB_COMMIT: 652c6b8bba3d6b3e909449c38b35281d046a752b
 
     steps:
       - name: Install dependencies
@@ -59,20 +63,20 @@ jobs:
       - name: "📥 Download GSD"
         id: download_gsd
         run: |
-          
+
           # 使用GitHub CLI下载Release文件
-          gh release download "gsd-50.3" \
-            --pattern "*gsd*.deb" \
+          gh release download "gsd-${{ matrix.os }}" \
+            --pattern "*.deb" \
             --repo "${{ github.repository }}" \
             --clobber
-          
+
           # 验证下载的文件
           DEB_COUNT=$(ls -1 *.deb 2>/dev/null | wc -l)
           if [ $DEB_COUNT -eq 0 ]; then
             echo "❌ 错误：未下载到任何内核包！"
             exit 1
           fi
-          
+
           echo "✅ 成功下载 $DEB_COUNT 个内核包"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -96,10 +100,11 @@ jobs:
       - name: Clone source
         run: |
           git clone --recursive \
-            https://gitlab.gnome.org/World/MobileShell/mutter-mobile.git -b mobile-shell-devel-50 \
+            https://gitlab.gnome.org/World/MobileShell/mutter-mobile.git -b mobile \
             mutter-mobile-${COMMIT}
 
           cd mutter-mobile-${COMMIT}
+          git checkout ${COMMIT}
           git submodule update --init --recursive
 
       # ✅ Extract aman
@@ -165,7 +170,7 @@ jobs:
           Architecture: arm64
           Maintainer: Newbyte
           Depends: gnome-settings-daemon
-          Description: Mutter Mobile (Debian Trixie build)
+          Description: Mutter Mobile (Debian Forky / Ubuntu 26.04 build)
           EOF
 
           dpkg-deb --build deb mutter-mobile.deb
@@ -173,7 +178,7 @@ jobs:
       - name: "📤 上传构建产物"
         uses: actions/upload-artifact@v4
         with:
-          name: mutter
+          name: mutter-${{ matrix.os }}
           path: "*.deb"
           retention-days: 7
           if-no-files-found: error
@@ -181,8 +186,8 @@ jobs:
       - name: "🏷️ 创建GitHub Release"
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: mutter-50.3
-          name: "mutter"
+          tag_name: mutter-51
+          name: "mutter (${{ matrix.os }})"
           body: |
             🧩 mutter
           draft: false
