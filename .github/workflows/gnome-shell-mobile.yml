@@ -34,8 +34,7 @@ jobs:
             wget \
             curl \
             ca-certificates \
-            gnupg \
-            gh
+            gnupg
 
       - name: Install build dependencies
         run: |
@@ -52,7 +51,8 @@ jobs:
             pkg-config \
             cmake \
             git \
-            gh
+            libglycin-2-dev \
+            librsvg2-dev
 
           apt-get build-dep -y \
             gnome-shell \
