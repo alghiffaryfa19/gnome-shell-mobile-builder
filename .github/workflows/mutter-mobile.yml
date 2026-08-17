@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
 
     container:
-      image: debian:trixie
+      image: debian:forky
 
     env:
       PKGVER: 50.3

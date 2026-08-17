@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
 
     container:
-      image: debian:trixie
+      image: debian:forky
 
     env:
       # Pakai versi lebih tinggi dari paket Debian agar tidak dianggap downgrade saat nanti diinstall
