@@ -24,7 +24,7 @@ jobs:
       image: debian:forky
 
     env:
-      PKGVER: 51.0
+      PKGVER: 50.mobile.0
       PKGREL: 3
       COMMIT: mobile
       GVDB_COMMIT: 652c6b8bba3d6b3e909449c38b35281d046a752b
