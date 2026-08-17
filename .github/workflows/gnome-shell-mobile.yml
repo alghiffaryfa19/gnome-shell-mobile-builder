@@ -85,7 +85,7 @@ jobs:
         run: |
           mkdir -p deps/gsd
 
-          gh release download "gsd-51~beta" \
+          gh release download "gsd-50.3" \
             --pattern "*gsd*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/gsd \
@@ -178,7 +178,6 @@ jobs:
             gnome-shell-mobile-${COMMIT}
 
           cd gnome-shell-mobile-${COMMIT}
-          git checkout ${COMMIT}
           git submodule update --init --recursive
 
       - name: Verify pkg-config dependencies

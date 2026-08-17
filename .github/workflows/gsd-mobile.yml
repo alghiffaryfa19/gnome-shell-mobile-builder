@@ -107,7 +107,7 @@ jobs:
       - name: "🏷️ 创建GitHub Release"
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: gsd-${PKGVER}
+          tag_name: gsd-50.3
           name: "GSD"
           body: |
             🧩 GSD

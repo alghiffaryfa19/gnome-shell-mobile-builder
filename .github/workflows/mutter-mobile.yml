@@ -53,7 +53,7 @@ jobs:
         run: |
           
           # 使用GitHub CLI下载Release文件
-          gh release download "gsd" \
+          gh release download "gsd-50.3" \
             --pattern "*gsd*.deb" \
             --repo "${{ github.repository }}" \
             --clobber
@@ -92,7 +92,6 @@ jobs:
             mutter-mobile-${COMMIT}
 
           cd mutter-mobile-${COMMIT}
-          git checkout ${COMMIT}
           git submodule update --init --recursive
 
       # ✅ Extract aman
@@ -176,7 +175,7 @@ jobs:
       - name: "🏷️ 创建GitHub Release"
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: mutter-${PKGVER}
+          tag_name: mutter-50.3
           name: "mutter"
           body: |
             🧩 mutter
