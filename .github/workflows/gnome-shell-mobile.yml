@@ -63,7 +63,7 @@ jobs:
         run: |
           mkdir -p deps/mutter
 
-          gh release download "mutter" \
+          gh release download "mutter-48" \
             --pattern "*mutter*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/mutter \
@@ -85,7 +85,7 @@ jobs:
         run: |
           mkdir -p deps/gsd
 
-          gh release download "gsd" \
+          gh release download "gsd-48" \
             --pattern "*gsd*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/gsd \
