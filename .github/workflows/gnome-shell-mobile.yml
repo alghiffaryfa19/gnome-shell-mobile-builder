@@ -72,7 +72,7 @@ jobs:
         run: |
           mkdir -p deps/mutter
 
-          gh release download "mutter-51" \
+          gh release download "mutter-50" \
             --pattern "*mutter*.deb" \
             --repo "${{ github.repository }}" \
             --dir deps/mutter \

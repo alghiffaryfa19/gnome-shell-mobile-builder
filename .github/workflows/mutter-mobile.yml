@@ -100,11 +100,10 @@ jobs:
       - name: Clone source
         run: |
           git clone --recursive \
-            https://gitlab.gnome.org/World/MobileShell/mutter-mobile.git -b mobile \
+            https://gitlab.gnome.org/World/MobileShell/mutter-mobile.git -b mobile-shell-devel-50 \
             mutter-mobile-${COMMIT}
 
           cd mutter-mobile-${COMMIT}
-          git checkout ${COMMIT}
           git submodule update --init --recursive
 
       # ✅ Extract aman
@@ -186,7 +185,7 @@ jobs:
       - name: "🏷️ 创建GitHub Release"
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: mutter-51
+          tag_name: mutter-50
           name: "mutter (${{ matrix.os }})"
           body: |
             🧩 mutter
