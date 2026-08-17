@@ -12,34 +12,27 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [debian]
-        
-    container:
-      image: debian:forky
 
     env:
-      PKGVER: 51~beta
-      PKGREL: 1
-      COMMIT: 51.beta
-      GVC_COMMIT: 0a4eda0cdc2deb352bebc70ec697c42af46094e4
+      PKGVER: 48.0
+      PKGREL: 4
+      COMMIT: 48.mobile.0
+      GVC_COMMIT: 47c47a423ff2f55bb038d92517e4782cf051496a
 
     steps:
       - name: Install dependencies
         run: |
-          sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/debian.sources
+          sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
 
-          apt-get update
+          sudo apt-get update
 
-          apt-get install -y \
+          sudo apt-get install -y \
             build-essential \
             meson \
             ninja-build \
-            pkg-config git
+            pkg-config
 
-          apt-get build-dep -y \
+          sudo apt-get build-dep -y \
             gnome-shell \
             mutter \
             gnome-settings-daemon
@@ -48,10 +41,11 @@ jobs:
       - name: Clone source
         run: |
           git clone --recursive \
-            https://gitlab.gnome.org/World/MobileShell/gnome-settings-daemon-mobile.git -b main \
+            https://gitlab.gnome.org/verdre/gnome-settings-daemon-mobile.git -b gnome-48-mobile \
             gnome-settings-daemon-mobile-${COMMIT}
 
           cd gnome-settings-daemon-mobile-${COMMIT}
+          git checkout ${COMMIT}
           git submodule update --init --recursive
 
       # ✅ EXTRACT AMAN
@@ -107,7 +101,7 @@ jobs:
       - name: "🏷️ 创建GitHub Release"
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: gsd-50.3
+          tag_name: gsd-48
           name: "GSD"
           body: |
             🧩 GSD
