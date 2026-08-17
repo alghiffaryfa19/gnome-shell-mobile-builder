@@ -46,6 +46,11 @@ jobs:
             mutter \
             gnome-settings-daemon
 
+          # Install GitHub CLI (gh) manually since it is not in Debian Forky
+          wget https://github.com/cli/cli/releases/download/v2.54.0/gh_2.54.0_linux_arm64.tar.gz
+          tar xzf gh_*_linux_arm64.tar.gz
+          cp gh_*_linux_arm64/bin/gh /usr/local/bin/
+
           mkdir -p /usr/share/dbus-1/interfaces
           ln -s /usr/share/dbus-1/interfaces/org.gnome.Sysprof.Profiler.xml \
                 /usr/share/dbus-1/interfaces/org.gnome.Sysprof3.Profiler.xml || true
